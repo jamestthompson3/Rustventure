@@ -114,7 +114,7 @@ impl Enemy {
         Enemy { x, y, health }
     }
     pub fn coords(&self) -> Vec<u32> {
-        [self.x, self.y]
+        vec![self.x, self.y]
     }
     pub fn health(&self) -> u32 {
         self.health
@@ -163,7 +163,7 @@ impl Hero {
         self.y = if self.y == 0 { 0 } else { self.y + 1 }
     }
     pub fn coords(&self) -> Vec<u32> {
-        [self.x, self.y]
+        vec![self.x, self.y]
     }
     pub fn health(&self) -> u32 {
         self.health
@@ -187,19 +187,19 @@ impl Hero {
 // TODO randomly assign values for treasure items
 fn seed_loot(height: &u32, width: &u32) -> Vec<TreasureChest> {
     let mut rng = thread_rng();
-    let num_boxes = rng.gen_range(0, 25);
+    let num_boxes: u32 = rng.gen_range(0, 25);
     let mut boxes = Vec::new();
 
     for n in 0..num_boxes {
-        let x = rng.gen_range(0, *width);
-        let y = rng.gen_range(0, *height);
-        let contents_gen = rng.gen_range(0, 5);
+        let x: u32 = rng.gen_range(0, *width);
+        let y: u32 = rng.gen_range(0, *height);
+        let contents_gen: u32 = rng.gen_range(0, 5);
         let loot = match contents_gen {
-            0 => Potion,
-            1 => Key,
-            2 => Arrow,
-            3 => Trap,
-            4 => Gold,
+            0 => Treasure::Potion,
+            1 => Treasure::Key,
+            2 => Treasure::Arrow,
+            3 => Treasure::Trap,
+            4 => Treasure::Gold,
         };
         boxes.push(TreasureChest { x, y, loot });
     }
