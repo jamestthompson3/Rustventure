@@ -57,7 +57,7 @@ const drawCells = () => {
         continue
       }
 
-      ctx.fillRect(col * (PIXEL_SIZE + 1) + 1, row * (PIXEL_SIZE + 1) + 1, PIXEL_SIZE, PIXEL_SIZE)
+      ctx.fillRect(col * PIXEL_SIZE, row * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE)
     }
   }
 
@@ -70,7 +70,7 @@ const drawCells = () => {
         continue
       }
 
-      ctx.fillRect(col * (PIXEL_SIZE + 1) + 1, row * (PIXEL_SIZE + 1) + 1, PIXEL_SIZE, PIXEL_SIZE)
+      ctx.fillRect(col * PIXEL_SIZE, row * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE)
     }
   }
 
@@ -83,7 +83,7 @@ const drawCells = () => {
         continue
       }
 
-      ctx.fillRect(col * (PIXEL_SIZE + 1) + 1, row * (PIXEL_SIZE + 1) + 1, PIXEL_SIZE, PIXEL_SIZE)
+      ctx.fillRect(col * PIXEL_SIZE, row * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE)
     }
   }
 
