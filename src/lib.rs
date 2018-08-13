@@ -98,89 +98,83 @@ impl World {
     }
 }
 
-#[wasm_bindgen]
-pub struct Enemy {
-    x: u32,
-    y: u32,
-    health: u32,
+enum Classification {
+    Hero,
+    Enemy,
 }
 
 #[wasm_bindgen]
-impl Enemy {
-    pub fn new() -> Enemy {
+pub struct Character {
+    x: u32,
+    y: u32,
+    health: u32,
+    classification: Classification,
+}
+
+#[wasm_bindgen]
+impl Character {
+    pub fn new_enemy() -> Character {
         let health = 40;
         let x = 0;
         let y = 0;
-        Enemy { x, y, health }
-    }
-    pub fn coords(&self) -> Vec<u32> {
-        vec![self.x, self.y]
-    }
-    pub fn health(&self) -> u32 {
-        self.health
-    }
-    pub fn take_damage(&self, hit: u32) -> u32 {
-        self.health = if self.health == 0 {
-            0
-        } else {
-            self.health - hit
+        let class = Classification::Enemy;
+        Character {
+            x,
+            y,
+            health,
+            classification: class,
         }
     }
-    pub fn heal(&self, heal: u32) -> u32 {
-        self.health = if self.health == 100 {
-            100
-        } else {
-            self.health + heal
-        }
-    }
-}
-
-#[wasm_bindgen]
-pub struct Hero {
-    x: u32,
-    y: u32,
-    health: u32,
-}
-
-#[wasm_bindgen]
-impl Hero {
-    pub fn new() -> Hero {
+    pub fn new_hero() -> Character {
         let health = 100;
         let x = 0;
         let y = 0;
-        Hero { x, y, health }
+        let class = Classification::Hero;
+        Character {
+            x,
+            y,
+            health,
+            classification: class,
+        }
     }
-    pub fn move_left(&self) {
-        self.x = if self.x == 0 { 0 } else { self.x - 1 }
-    }
-    pub fn move_right(&self) {
-        self.x = if self.x == 0 { 0 } else { self.x + 1 }
-    }
-    pub fn move_down(&self) {
-        self.y = if self.y == 0 { 0 } else { self.y - 1 }
-    }
-    pub fn move_up(&self) {
-        self.y = if self.y == 0 { 0 } else { self.y + 1 }
-    }
+
     pub fn coords(&self) -> Vec<u32> {
         vec![self.x, self.y]
+    }
+    pub fn get_class(&self) -> u8 {
+        match self.classification {
+            Classification::Hero => 1,
+            Classification::Enemy => 0,
+        }
     }
     pub fn health(&self) -> u32 {
         self.health
     }
-    pub fn take_damage(&self, hit: u32) -> u32 {
+    pub fn take_damage(&mut self, hit: u32) {
         self.health = if self.health == 0 {
             0
         } else {
             self.health - hit
         }
     }
-    pub fn heal(&self, heal: u32) -> u32 {
+    pub fn heal(&mut self, heal: u32) {
         self.health = if self.health == 100 {
             100
         } else {
             self.health + heal
         }
+    }
+    pub fn move_left(&mut self) {
+        self.x = if self.x == 0 { 0 } else { self.x - 1 }
+    }
+    pub fn move_right(&mut self) {
+        self.x = if self.x == 0 { 0 } else { self.x + 1 }
+    }
+    pub fn move_down(&mut self) {
+        self.y = if self.y == 0 { 0 } else { self.y - 1 }
+    }
+    pub fn move_up(&mut self) {
+        self.y = if self.y == 0 { 0 } else { self.y + 1 }
     }
 }
 
@@ -190,7 +184,7 @@ fn seed_loot(height: &u32, width: &u32) -> Vec<TreasureChest> {
     let num_boxes: u32 = rng.gen_range(0, 25);
     let mut boxes = Vec::new();
 
-    for n in 0..num_boxes {
+    for _ in 0..num_boxes {
         let x: u32 = rng.gen_range(0, *width);
         let y: u32 = rng.gen_range(0, *height);
         let contents_gen: u32 = rng.gen_range(0, 5);
@@ -200,6 +194,7 @@ fn seed_loot(height: &u32, width: &u32) -> Vec<TreasureChest> {
             2 => Treasure::Arrow,
             3 => Treasure::Trap,
             4 => Treasure::Gold,
+            _ => Treasure::Gold,
         };
         boxes.push(TreasureChest { x, y, loot });
     }
