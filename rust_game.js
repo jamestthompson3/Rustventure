@@ -22,6 +22,113 @@ function globalArgumentPtr() {
 }
 /**
 */
+export class Gold {
+    
+    static __construct(ptr) {
+        return new Gold(ptr);
+    }
+    
+    constructor(ptr) {
+        this.ptr = ptr;
+    }
+    
+    free() {
+        const ptr = this.ptr;
+        this.ptr = 0;
+        wasm.__wbg_gold_free(ptr);
+    }
+}
+/**
+*/
+export class World {
+    
+    static __construct(ptr) {
+        return new World(ptr);
+    }
+    
+    constructor(ptr) {
+        this.ptr = ptr;
+    }
+    
+    free() {
+        const ptr = this.ptr;
+        this.ptr = 0;
+        wasm.__wbg_world_free(ptr);
+    }
+    /**
+    * @param {number} arg0
+    * @param {number} arg1
+    * @returns {World}
+    */
+    static new(arg0, arg1) {
+        return World.__construct(wasm.world_new(arg0, arg1));
+    }
+    /**
+    * @returns {number}
+    */
+    width() {
+        if (this.ptr === 0) {
+            throw new Error('Attempt to use a moved value');
+        }
+        return wasm.world_width(this.ptr);
+    }
+    /**
+    * @returns {number}
+    */
+    height() {
+        if (this.ptr === 0) {
+            throw new Error('Attempt to use a moved value');
+        }
+        return wasm.world_height(this.ptr);
+    }
+    /**
+    * @returns {number}
+    */
+    pixels() {
+        if (this.ptr === 0) {
+            throw new Error('Attempt to use a moved value');
+        }
+        return wasm.world_pixels(this.ptr);
+    }
+}
+/**
+*/
+export class Potion {
+    
+    static __construct(ptr) {
+        return new Potion(ptr);
+    }
+    
+    constructor(ptr) {
+        this.ptr = ptr;
+    }
+    
+    free() {
+        const ptr = this.ptr;
+        this.ptr = 0;
+        wasm.__wbg_potion_free(ptr);
+    }
+}
+/**
+*/
+export class Trap {
+    
+    static __construct(ptr) {
+        return new Trap(ptr);
+    }
+    
+    constructor(ptr) {
+        this.ptr = ptr;
+    }
+    
+    free() {
+        const ptr = this.ptr;
+        this.ptr = 0;
+        wasm.__wbg_trap_free(ptr);
+    }
+}
+/**
+*/
 export class Character {
     
     static __construct(ptr) {
@@ -144,60 +251,6 @@ export class Character {
 }
 /**
 */
-export class TreasureChest {
-    
-    static __construct(ptr) {
-        return new TreasureChest(ptr);
-    }
-    
-    constructor(ptr) {
-        this.ptr = ptr;
-    }
-    
-    free() {
-        const ptr = this.ptr;
-        this.ptr = 0;
-        wasm.__wbg_treasurechest_free(ptr);
-    }
-}
-/**
-*/
-export class Potion {
-    
-    static __construct(ptr) {
-        return new Potion(ptr);
-    }
-    
-    constructor(ptr) {
-        this.ptr = ptr;
-    }
-    
-    free() {
-        const ptr = this.ptr;
-        this.ptr = 0;
-        wasm.__wbg_potion_free(ptr);
-    }
-}
-/**
-*/
-export class Trap {
-    
-    static __construct(ptr) {
-        return new Trap(ptr);
-    }
-    
-    constructor(ptr) {
-        this.ptr = ptr;
-    }
-    
-    free() {
-        const ptr = this.ptr;
-        this.ptr = 0;
-        wasm.__wbg_trap_free(ptr);
-    }
-}
-/**
-*/
 export class Key {
     
     static __construct(ptr) {
@@ -216,77 +269,6 @@ export class Key {
 }
 /**
 */
-export class World {
-    
-    static __construct(ptr) {
-        return new World(ptr);
-    }
-    
-    constructor(ptr) {
-        this.ptr = ptr;
-    }
-    
-    free() {
-        const ptr = this.ptr;
-        this.ptr = 0;
-        wasm.__wbg_world_free(ptr);
-    }
-    /**
-    * @param {number} arg0
-    * @param {number} arg1
-    * @returns {World}
-    */
-    static new(arg0, arg1) {
-        return World.__construct(wasm.world_new(arg0, arg1));
-    }
-    /**
-    * @returns {number}
-    */
-    width() {
-        if (this.ptr === 0) {
-            throw new Error('Attempt to use a moved value');
-        }
-        return wasm.world_width(this.ptr);
-    }
-    /**
-    * @returns {number}
-    */
-    height() {
-        if (this.ptr === 0) {
-            throw new Error('Attempt to use a moved value');
-        }
-        return wasm.world_height(this.ptr);
-    }
-    /**
-    * @returns {number}
-    */
-    pixels() {
-        if (this.ptr === 0) {
-            throw new Error('Attempt to use a moved value');
-        }
-        return wasm.world_pixels(this.ptr);
-    }
-}
-/**
-*/
-export class Gold {
-    
-    static __construct(ptr) {
-        return new Gold(ptr);
-    }
-    
-    constructor(ptr) {
-        this.ptr = ptr;
-    }
-    
-    free() {
-        const ptr = this.ptr;
-        this.ptr = 0;
-        wasm.__wbg_gold_free(ptr);
-    }
-}
-/**
-*/
 export class Arrow {
     
     static __construct(ptr) {
@@ -301,6 +283,24 @@ export class Arrow {
         const ptr = this.ptr;
         this.ptr = 0;
         wasm.__wbg_arrow_free(ptr);
+    }
+}
+/**
+*/
+export class TreasureChest {
+    
+    static __construct(ptr) {
+        return new TreasureChest(ptr);
+    }
+    
+    constructor(ptr) {
+        this.ptr = ptr;
+    }
+    
+    free() {
+        const ptr = this.ptr;
+        this.ptr = 0;
+        wasm.__wbg_treasurechest_free(ptr);
     }
 }
 

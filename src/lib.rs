@@ -12,7 +12,7 @@ pub struct World {
     width: u32,
     height: u32,
     pixels: Vec<Pixel>,
-    loot: Vec<TreasureChest>,
+    // loot: Vec<TreasureChest>,
 }
 
 #[wasm_bindgen]
@@ -78,13 +78,13 @@ impl World {
                 1000..1200 => Pixel::Ice,
                 _ => Pixel::Grass,
             }).collect();
-        let loot = seed_loot(&width, &height);
+        // let loot = seed_loot(&width, &height);
 
         World {
             width,
             height,
             pixels,
-            loot,
+            // loot,
         }
     }
     pub fn width(&self) -> u32 {
@@ -137,7 +137,6 @@ impl Character {
             classification: class,
         }
     }
-
     pub fn coords(&self) -> Vec<u32> {
         vec![self.x, self.y]
     }
@@ -165,16 +164,16 @@ impl Character {
         }
     }
     pub fn move_left(&mut self) {
-        self.x = if self.x == 0 { 0 } else { self.x - 1 }
+        self.x = self.x - 1
     }
     pub fn move_right(&mut self) {
-        self.x = if self.x == 0 { 0 } else { self.x + 1 }
+        self.x = self.x + 1
     }
     pub fn move_down(&mut self) {
-        self.y = if self.y == 0 { 0 } else { self.y - 1 }
+        self.y = self.y - 1
     }
     pub fn move_up(&mut self) {
-        self.y = if self.y == 0 { 0 } else { self.y + 1 }
+        self.y = self.y + 1
     }
 }
 
