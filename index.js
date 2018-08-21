@@ -1,6 +1,5 @@
 import { World } from './rust_game'
 import { memory } from './rust_game_bg'
-import { Character } from './rust_game'
 // styles
 const GRASS_COLOR = '#2f7a60'
 const ICE_COLOR = '#63e3f9'
@@ -16,9 +15,8 @@ const ICE = 3
 // create game map
 const width = parseInt((window.innerWidth * 0.85).toFixed(2), 10)
 const height = parseInt((window.innerHeight * 0.85).toFixed(2), 10)
-const world = World.new(width, height)
+const world = World.new(width, height, 'kevin')
 const PIXEL_SIZE = 10
-let hero = Character.new_hero()
 
 // setup canvas
 const canvas = document.getElementById('game-canvas')
@@ -32,27 +30,12 @@ const RIGHT = 68
 const UP = 87
 const DOWN = 83
 
-const keyFunctionMap = {
-  [UP]: hero.move_up,
-  [DOWN]: hero.move_down,
-  [RIGHT]: hero.move_right,
-  [LEFT]: hero.move_left
-}
 const bindingsArray = [LEFT, RIGHT, UP, DOWN]
 const handleMove = e => {
-  switch (e.which) {
-    case LEFT:
-      hero.move_left()
-    case RIGHT:
-      hero.move_right()
-    case UP:
-      hero.move_up()
-    case DOWN:
-      hero.move_down()
-    default:
-      break
+  if (bindingsArray.includes(e.which)) {
+    world.tick(e.which)
+    drawCells()
   }
-  drawCells()
 }
 
 document.addEventListener('keydown', handleMove)
@@ -77,7 +60,6 @@ const drawCells = () => {
   }
 
   ctx.beginPath()
-
   // Because changing the `fillStyle` is an expensive operation, we want to
   // avoid doing it for every cell. Instead, we do for each land type
   ctx.fillStyle = GRASS_COLOR
@@ -90,7 +72,7 @@ const drawCells = () => {
   drawPixel(ICE)
 
   // hero
-  const [x, y] = hero.coords()
+  const [x, y] = world.hero.coords()
   ctx.fillStyle = '#000'
   ctx.fillRect(x, y, 4, 4)
 }
