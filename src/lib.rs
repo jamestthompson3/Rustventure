@@ -1,9 +1,10 @@
 #![feature(use_extern_macros)]
 #![feature(exclusive_range_pattern)]
 
+extern crate console_error_panic_hook;
 extern crate rand;
 extern crate wasm_bindgen;
-pub mod characters;
+mod characters;
 
 use characters::*;
 use rand::prelude::*;
@@ -14,10 +15,10 @@ pub struct World {
     width: u32,
     height: u32,
     pixels: Vec<Pixel>,
-    loot: Vec<TreasureChest>,
     hero: Character,
 }
 
+// loot: Vec<TreasureChest>,
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_namespace = console)]
@@ -32,6 +33,7 @@ macro_rules! log {
 #[wasm_bindgen]
 impl World {
     pub fn new(width: u32, height: u32, hero_name: String) -> World {
+        console_error_panic_hook::set_once();
         let pixels: Vec<Pixel> = (0..width * height)
             .map(|i| match i {
                 0..700 => Pixel::Water,
@@ -40,16 +42,14 @@ impl World {
                 _ => Pixel::Grass,
             }).collect();
 
-        let made = String::from("created map");
-        log(&made);
-        let loot = seed_loot(&width, &height);
+        // let loot = seed_loot(&width, &height);
+
         let hero = Character::new_hero(hero_name);
 
         World {
             width,
             height,
             pixels,
-            loot,
             hero,
         }
     }
@@ -61,6 +61,9 @@ impl World {
     }
     pub fn pixels(&self) -> *const Pixel {
         self.pixels.as_ptr()
+    }
+    pub fn get_hero_coords(&self) {
+        self.hero.coords();
     }
     pub fn tick(&mut self, event_code: u32) {
         match event_code {
@@ -81,7 +84,7 @@ impl World {
     }
 }
 
-// TODO randomly assign values for treasure items
+// TODO randomly assign values for treasure items also this part causes the wasm to fail :/
 fn seed_loot(height: &u32, width: &u32) -> Vec<TreasureChest> {
     let mut rng = thread_rng();
     let num_boxes: u32 = rng.gen_range(0, 25);
@@ -92,12 +95,15 @@ fn seed_loot(height: &u32, width: &u32) -> Vec<TreasureChest> {
         let y: u32 = rng.gen_range(0, *height);
         let contents_gen: u32 = rng.gen_range(0, 5);
         let loot = match contents_gen {
-            0 => Treasure::Potion,
-            1 => Treasure::Key,
-            2 => Treasure::Arrow,
-            3 => Treasure::Trap,
-            4 => Treasure::Gold,
-            _ => Treasure::Gold,
+            0 => Treasure::Potion { value: 2 },
+            1 => Treasure::Key {
+                name: String::from("dungeon key"),
+                quantity: 1,
+            },
+            2 => Treasure::Arrow { quantity: 12 },
+            3 => Treasure::Trap { damage: 3 },
+            4 => Treasure::Gold { value: 30 },
+            _ => Treasure::Gold { value: 10 },
         };
         boxes.push(TreasureChest { x, y, loot });
     }
@@ -105,32 +111,7 @@ fn seed_loot(height: &u32, width: &u32) -> Vec<TreasureChest> {
 }
 
 #[wasm_bindgen]
-pub struct Potion {
-    value: u32,
-}
-
-#[wasm_bindgen]
-pub struct Trap {
-    value: u32,
-}
-
-#[wasm_bindgen]
-pub struct Gold {
-    value: u32,
-}
-
-#[wasm_bindgen]
-pub struct Key {
-    name: String,
-    value: u32,
-}
-
-#[wasm_bindgen]
-pub struct Arrow {
-    quantity: u32,
-}
-
-#[wasm_bindgen]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct TreasureChest {
     x: u32,
     y: u32,
@@ -147,11 +128,11 @@ pub enum Pixel {
 }
 
 #[repr(u8)]
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Treasure {
-    Gold,
-    Potion,
-    Trap,
-    Key,
-    Arrow,
+    Gold { value: u32 },
+    Potion { value: u32 },
+    Trap { damage: u32 },
+    Key { quantity: u8, name: String },
+    Arrow { quantity: u32 },
 }

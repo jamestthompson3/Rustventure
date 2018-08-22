@@ -72,7 +72,10 @@ const drawCells = () => {
   drawPixel(ICE)
 
   // hero
+  console.log('get hero coords', world.get_hero_coords())
+  console.log('world.hero', world.hero)
   const [x, y] = world.hero.coords()
+  console.log(x, y)
   ctx.fillStyle = '#000'
   ctx.fillRect(x, y, 4, 4)
 }

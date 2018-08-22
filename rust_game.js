@@ -1,13 +1,11 @@
 /* tslint:disable */
 import * as wasm from './rust_game_bg';
 
-const __wbg_log_16fb644dd1745f1d_target = console.log;
+const TextEncoder = typeof self === 'object' && self.TextEncoder
+    ? self.TextEncoder
+    : require('util').TextEncoder;
 
-const TextDecoder = typeof self === 'object' && self.TextDecoder
-    ? self.TextDecoder
-    : require('util').TextDecoder;
-
-let cachedDecoder = new TextDecoder('utf-8');
+let cachedEncoder = new TextEncoder('utf-8');
 
 let cachegetUint8Memory = null;
 function getUint8Memory() {
@@ -17,27 +15,22 @@ function getUint8Memory() {
     return cachegetUint8Memory;
 }
 
-function getStringFromWasm(ptr, len) {
-    return cachedDecoder.decode(getUint8Memory().subarray(ptr, ptr + len));
-}
-
-export function __wbg_log_16fb644dd1745f1d(arg0, arg1) {
-    let varg0 = getStringFromWasm(arg0, arg1);
-    __wbg_log_16fb644dd1745f1d_target(varg0);
-}
-
-const TextEncoder = typeof self === 'object' && self.TextEncoder
-    ? self.TextEncoder
-    : require('util').TextEncoder;
-
-let cachedEncoder = new TextEncoder('utf-8');
-
 function passStringToWasm(arg) {
     
     const buf = cachedEncoder.encode(arg);
     const ptr = wasm.__wbindgen_malloc(buf.length);
     getUint8Memory().set(buf, ptr);
     return [ptr, buf.length];
+}
+
+const TextDecoder = typeof self === 'object' && self.TextDecoder
+    ? self.TextDecoder
+    : require('util').TextDecoder;
+
+let cachedDecoder = new TextDecoder('utf-8');
+
+function getStringFromWasm(ptr, len) {
+    return cachedDecoder.decode(getUint8Memory().subarray(ptr, ptr + len));
 }
 
 let cachedGlobalArgumentPtr = null;
@@ -58,6 +51,91 @@ function getUint32Memory() {
 
 function getArrayU32FromWasm(ptr, len) {
     return getUint32Memory().subarray(ptr / 4, ptr / 4 + len);
+}
+
+const __wbg_error_2c2dd5f14f439749_target = console.error;
+
+export function __wbg_error_2c2dd5f14f439749(arg0, arg1) {
+    let varg0 = getStringFromWasm(arg0, arg1);
+    
+    varg0 = varg0.slice();
+    wasm.__wbindgen_free(arg0, arg1 * 1);
+    
+    __wbg_error_2c2dd5f14f439749_target(varg0);
+}
+/**
+*/
+export class World {
+    
+    static __construct(ptr) {
+        return new World(ptr);
+    }
+    
+    constructor(ptr) {
+        this.ptr = ptr;
+    }
+    
+    free() {
+        const ptr = this.ptr;
+        this.ptr = 0;
+        wasm.__wbg_world_free(ptr);
+    }
+    /**
+    * @param {number} arg0
+    * @param {number} arg1
+    * @param {string} arg2
+    * @returns {World}
+    */
+    static new(arg0, arg1, arg2) {
+        const [ptr2, len2] = passStringToWasm(arg2);
+        return World.__construct(wasm.world_new(arg0, arg1, ptr2, len2));
+    }
+    /**
+    * @returns {number}
+    */
+    width() {
+        if (this.ptr === 0) {
+            throw new Error('Attempt to use a moved value');
+        }
+        return wasm.world_width(this.ptr);
+    }
+    /**
+    * @returns {number}
+    */
+    height() {
+        if (this.ptr === 0) {
+            throw new Error('Attempt to use a moved value');
+        }
+        return wasm.world_height(this.ptr);
+    }
+    /**
+    * @returns {number}
+    */
+    pixels() {
+        if (this.ptr === 0) {
+            throw new Error('Attempt to use a moved value');
+        }
+        return wasm.world_pixels(this.ptr);
+    }
+    /**
+    * @returns {void}
+    */
+    get_hero_coords() {
+        if (this.ptr === 0) {
+            throw new Error('Attempt to use a moved value');
+        }
+        return wasm.world_get_hero_coords(this.ptr);
+    }
+    /**
+    * @param {number} arg0
+    * @returns {void}
+    */
+    tick(arg0) {
+        if (this.ptr === 0) {
+            throw new Error('Attempt to use a moved value');
+        }
+        return wasm.world_tick(this.ptr, arg0);
+    }
 }
 /**
 */
@@ -100,11 +178,11 @@ export class Character {
         const retptr = globalArgumentPtr();
         wasm.character_name(retptr, this.ptr);
         const mem = getUint32Memory();
-        const ptr = mem[retptr / 4];
-        const len = mem[retptr / 4 + 1];
+        const rustptr = mem[retptr / 4];
+        const rustlen = mem[retptr / 4 + 1];
         
-        const realRet = getStringFromWasm(ptr, len).slice();
-        wasm.__wbindgen_free(ptr, len * 1);
+        const realRet = getStringFromWasm(rustptr, rustlen).slice();
+        wasm.__wbindgen_free(rustptr, rustlen * 1);
         return realRet;
         
     }
@@ -118,11 +196,11 @@ export class Character {
         const retptr = globalArgumentPtr();
         wasm.character_coords(retptr, this.ptr);
         const mem = getUint32Memory();
-        const ptr = mem[retptr / 4];
-        const len = mem[retptr / 4 + 1];
+        const rustptr = mem[retptr / 4];
+        const rustlen = mem[retptr / 4 + 1];
         
-        const realRet = getArrayU32FromWasm(ptr, len).slice();
-        wasm.__wbindgen_free(ptr, len * 4);
+        const realRet = getArrayU32FromWasm(rustptr, rustlen).slice();
+        wasm.__wbindgen_free(rustptr, rustlen * 4);
         return realRet;
         
     }
@@ -203,125 +281,6 @@ export class Character {
 }
 /**
 */
-export class Gold {
-    
-    static __construct(ptr) {
-        return new Gold(ptr);
-    }
-    
-    constructor(ptr) {
-        this.ptr = ptr;
-    }
-    
-    free() {
-        const ptr = this.ptr;
-        this.ptr = 0;
-        wasm.__wbg_gold_free(ptr);
-    }
-}
-/**
-*/
-export class World {
-    
-    static __construct(ptr) {
-        return new World(ptr);
-    }
-    
-    constructor(ptr) {
-        this.ptr = ptr;
-    }
-    
-    free() {
-        const ptr = this.ptr;
-        this.ptr = 0;
-        wasm.__wbg_world_free(ptr);
-    }
-    /**
-    * @param {number} arg0
-    * @param {number} arg1
-    * @param {string} arg2
-    * @returns {World}
-    */
-    static new(arg0, arg1, arg2) {
-        const [ptr2, len2] = passStringToWasm(arg2);
-        return World.__construct(wasm.world_new(arg0, arg1, ptr2, len2));
-    }
-    /**
-    * @returns {number}
-    */
-    width() {
-        if (this.ptr === 0) {
-            throw new Error('Attempt to use a moved value');
-        }
-        return wasm.world_width(this.ptr);
-    }
-    /**
-    * @returns {number}
-    */
-    height() {
-        if (this.ptr === 0) {
-            throw new Error('Attempt to use a moved value');
-        }
-        return wasm.world_height(this.ptr);
-    }
-    /**
-    * @returns {number}
-    */
-    pixels() {
-        if (this.ptr === 0) {
-            throw new Error('Attempt to use a moved value');
-        }
-        return wasm.world_pixels(this.ptr);
-    }
-    /**
-    * @param {number} arg0
-    * @returns {void}
-    */
-    tick(arg0) {
-        if (this.ptr === 0) {
-            throw new Error('Attempt to use a moved value');
-        }
-        return wasm.world_tick(this.ptr, arg0);
-    }
-}
-/**
-*/
-export class Trap {
-    
-    static __construct(ptr) {
-        return new Trap(ptr);
-    }
-    
-    constructor(ptr) {
-        this.ptr = ptr;
-    }
-    
-    free() {
-        const ptr = this.ptr;
-        this.ptr = 0;
-        wasm.__wbg_trap_free(ptr);
-    }
-}
-/**
-*/
-export class Arrow {
-    
-    static __construct(ptr) {
-        return new Arrow(ptr);
-    }
-    
-    constructor(ptr) {
-        this.ptr = ptr;
-    }
-    
-    free() {
-        const ptr = this.ptr;
-        this.ptr = 0;
-        wasm.__wbg_arrow_free(ptr);
-    }
-}
-/**
-*/
 export class TreasureChest {
     
     static __construct(ptr) {
@@ -336,42 +295,6 @@ export class TreasureChest {
         const ptr = this.ptr;
         this.ptr = 0;
         wasm.__wbg_treasurechest_free(ptr);
-    }
-}
-/**
-*/
-export class Key {
-    
-    static __construct(ptr) {
-        return new Key(ptr);
-    }
-    
-    constructor(ptr) {
-        this.ptr = ptr;
-    }
-    
-    free() {
-        const ptr = this.ptr;
-        this.ptr = 0;
-        wasm.__wbg_key_free(ptr);
-    }
-}
-/**
-*/
-export class Potion {
-    
-    static __construct(ptr) {
-        return new Potion(ptr);
-    }
-    
-    constructor(ptr) {
-        this.ptr = ptr;
-    }
-    
-    free() {
-        const ptr = this.ptr;
-        this.ptr = 0;
-        wasm.__wbg_potion_free(ptr);
     }
 }
 
