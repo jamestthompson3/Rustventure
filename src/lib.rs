@@ -16,6 +16,7 @@ pub struct World {
     height: u32,
     pixels: Vec<Pixel>,
     hero: Character,
+    loot: Vec<TreasureChest>,
 }
 
 // loot: Vec<TreasureChest>,
@@ -35,14 +36,19 @@ impl World {
     pub fn new(width: u32, height: u32, hero_name: String) -> World {
         console_error_panic_hook::set_once();
         let pixels: Vec<Pixel> = (0..width * height)
-            .map(|i| match i {
-                0..700 => Pixel::Water,
-                800..950 => Pixel::Desert,
-                1000..1200 => Pixel::Ice,
-                _ => Pixel::Grass,
+            .map(|i| {
+                if i % 7 == 0 {
+                    Pixel::Desert
+                } else if i % 4 == 0 || i % 3 == 1 {
+                    Pixel::Grass
+                } else if i % 5 == 0 {
+                    Pixel::Water
+                } else {
+                    Pixel::Grass
+                }
             }).collect();
 
-        // let loot = seed_loot(&width, &height);
+        let loot = seed_loot(&width, &height);
 
         let hero = Character::new_hero(hero_name);
 
@@ -51,6 +57,7 @@ impl World {
             height,
             pixels,
             hero,
+            loot,
         }
     }
     pub fn width(&self) -> u32 {
@@ -62,10 +69,11 @@ impl World {
     pub fn pixels(&self) -> *const Pixel {
         self.pixels.as_ptr()
     }
-    pub fn get_hero_coords(&self) {
-        self.hero.coords();
+    pub fn get_hero_coords(&self) -> Vec<u32> {
+        return self.hero.coords();
     }
     pub fn tick(&mut self, event_code: u32) {
+        let _timer = Timer::new("world tick");
         match event_code {
             64 => {
                 self.hero.move_left();
@@ -135,4 +143,30 @@ pub enum Treasure {
     Trap { damage: u32 },
     Key { quantity: u8, name: String },
     Arrow { quantity: u32 },
+}
+
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_namespace = console)]
+    fn time(name: &str);
+
+    #[wasm_bindgen(js_namespace = console)]
+    fn timeEnd(name: &str);
+}
+
+pub struct Timer<'a> {
+    name: &'a str,
+}
+
+impl<'a> Timer<'a> {
+    pub fn new(name: &'a str) -> Timer<'a> {
+        time(name);
+        Timer { name }
+    }
+}
+
+impl<'a> Drop for Timer<'a> {
+    fn drop(&mut self) {
+        timeEnd(self.name);
+    }
 }

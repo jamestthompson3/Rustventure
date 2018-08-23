@@ -43,6 +43,7 @@ document.addEventListener('keydown', handleMove)
 const getIndex = (row, column) => row * width + column
 
 const drawCells = () => {
+  console.time('drawCells')
   const cellsPtr = world.pixels()
   const cells = new Uint8Array(memory.buffer, cellsPtr, width * height)
 
@@ -72,12 +73,10 @@ const drawCells = () => {
   drawPixel(ICE)
 
   // hero
-  console.log('get hero coords', world.get_hero_coords())
-  console.log('world.hero', world.hero)
-  const [x, y] = world.hero.coords()
-  console.log(x, y)
+  const [x, y] = world.get_hero_coords()
   ctx.fillStyle = '#000'
-  ctx.fillRect(x, y, 4, 4)
+  ctx.fillRect(x, y, 6, 6)
+  console.timeEnd('drawCells')
 }
 
-drawCells()
+requestAnimationFrame(drawCells)
