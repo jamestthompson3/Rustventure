@@ -43,6 +43,43 @@ function globalArgumentPtr() {
     return cachedGlobalArgumentPtr;
 }
 
+const stack = [];
+
+const slab = [{ obj: undefined }, { obj: null }, { obj: true }, { obj: false }];
+
+function getObject(idx) {
+    if ((idx & 1) === 1) {
+        return stack[idx >> 1];
+    } else {
+        const val = slab[idx >> 1];
+        
+        return val.obj;
+        
+    }
+}
+
+let slab_next = slab.length;
+
+function dropRef(idx) {
+    
+    idx = idx >> 1;
+    if (idx < 4) return;
+    let obj = slab[idx];
+    
+    obj.cnt -= 1;
+    if (obj.cnt > 0) return;
+    
+    // If we hit 0 then free up our space in the slab
+    slab[idx] = slab_next;
+    slab_next = idx;
+}
+
+function takeObject(idx) {
+    const ret = getObject(idx);
+    dropRef(idx);
+    return ret;
+}
+
 const __wbg_time_3127089b3be1de08_target = console.time;
 
 const TextDecoder = typeof self === 'object' && self.TextDecoder
@@ -67,6 +104,12 @@ export function __wbg_timeEnd_84a125ce239dd100(arg0, arg1) {
     __wbg_timeEnd_84a125ce239dd100_target(varg0);
 }
 
+const __wbg_random_66a024bb58194b7c_target = Math.random;
+
+export function __wbg_random_66a024bb58194b7c() {
+    return __wbg_random_66a024bb58194b7c_target();
+}
+
 const __wbg_error_2c2dd5f14f439749_target = console.error;
 
 export function __wbg_error_2c2dd5f14f439749(arg0, arg1) {
@@ -76,42 +119,6 @@ export function __wbg_error_2c2dd5f14f439749(arg0, arg1) {
     wasm.__wbindgen_free(arg0, arg1 * 1);
     
     __wbg_error_2c2dd5f14f439749_target(varg0);
-}
-/**
-*/
-export class TreasureChest {
-    
-    static __construct(ptr) {
-        return new TreasureChest(ptr);
-    }
-    
-    constructor(ptr) {
-        this.ptr = ptr;
-    }
-    
-    free() {
-        const ptr = this.ptr;
-        this.ptr = 0;
-        wasm.__wbg_treasurechest_free(ptr);
-    }
-}
-/**
-*/
-export class Character {
-    
-    static __construct(ptr) {
-        return new Character(ptr);
-    }
-    
-    constructor(ptr) {
-        this.ptr = ptr;
-    }
-    
-    free() {
-        const ptr = this.ptr;
-        this.ptr = 0;
-        wasm.__wbg_character_free(ptr);
-    }
 }
 /**
 */
@@ -186,13 +193,13 @@ export class World {
         
     }
     /**
-    * @returns {number}
+    * @returns {any}
     */
-    get_loot() {
+    loot() {
         if (this.ptr === 0) {
             throw new Error('Attempt to use a moved value');
         }
-        return wasm.world_get_loot(this.ptr);
+        return takeObject(wasm.world_loot(this.ptr));
     }
     /**
     * @param {number} arg0
@@ -204,6 +211,57 @@ export class World {
         }
         return wasm.world_tick(this.ptr, arg0);
     }
+}
+/**
+*/
+export class Character {
+    
+    static __construct(ptr) {
+        return new Character(ptr);
+    }
+    
+    constructor(ptr) {
+        this.ptr = ptr;
+    }
+    
+    free() {
+        const ptr = this.ptr;
+        this.ptr = 0;
+        wasm.__wbg_character_free(ptr);
+    }
+}
+/**
+*/
+export class TreasureChest {
+    
+    static __construct(ptr) {
+        return new TreasureChest(ptr);
+    }
+    
+    constructor(ptr) {
+        this.ptr = ptr;
+    }
+    
+    free() {
+        const ptr = this.ptr;
+        this.ptr = 0;
+        wasm.__wbg_treasurechest_free(ptr);
+    }
+}
+
+function addHeapObject(obj) {
+    if (slab_next === slab.length) slab.push(slab.length + 1);
+    const idx = slab_next;
+    const next = slab[idx];
+    
+    slab_next = next;
+    
+    slab[idx] = { obj, cnt: 1 };
+    return idx << 1;
+}
+
+export function __wbindgen_json_parse(ptr, len) {
+    return addHeapObject(JSON.parse(getStringFromWasm(ptr, len)));
 }
 
 export function __wbindgen_throw(ptr, len) {
