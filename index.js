@@ -80,7 +80,7 @@ const drawCells = () => {
   drawPixel(ICE)
   // loot
   const boxes = world.loot()
-  boxes.map(box => {
+  boxes.forEach(box => {
     console.log(box.x, box.y)
     ctx.fillStyle = '#ffe030'
     ctx.fillRect(box.x, box.y, 8, 8)

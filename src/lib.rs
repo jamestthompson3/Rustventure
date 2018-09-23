@@ -181,10 +181,3 @@ extern "C" {
 macro_rules! log {
     ($($t:tt)*) => (log(&format!($($t)*)))
 }
-
-fn rand_range(_start: u32, _end: u32) -> u32 {
-    // let min = ceil(start as f64);
-    // let max = floor(end as f64);
-    // return floor(random() as f64) * (max - min) + min; //The maximum is exclusive and the minimum is inclusive
-    return random() as u32;
-}
