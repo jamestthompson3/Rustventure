@@ -22,7 +22,6 @@ const getRandomIntInclusive = (min, max) => {
 const width = parseInt((window.innerWidth * 0.85).toFixed(2), 10)
 const height = parseInt((window.innerHeight * 0.85).toFixed(2), 10)
 const world = World.new(width, height, 'kevin')
-const hero = Character.new_hero('bob')
 const PIXEL_SIZE = 10
 const banner = document.getElementById('collision')
 

@@ -92,10 +92,11 @@ impl World {
 
         let mut location_data: LocationData = LocationData::None;
 
-        for mut treasure in self.loot.iter() {
-            if *new_pos.get(0).unwrap() == treasure.x &&
-                    *new_pos.get(1).unwrap() == treasure.y &&
-                    ! treasure.isFound() {
+        for treasure in self.loot.iter_mut() {
+            if *new_pos.get(0).unwrap() == treasure.x
+                && *new_pos.get(1).unwrap() == treasure.y
+                && !treasure.isFound()
+            {
                 treasure.markAsFound();
                 location_data = LocationData::Treasure {
                     value: treasure.get_treasure(),
@@ -125,7 +126,12 @@ fn seed_loot(_height: &u32, _width: &u32) -> Vec<TreasureChest> {
             4 => Treasure::Gold { value: 30 },
             _ => Treasure::Gold { value: 10 },
         };
-        boxes.push(TreasureChest { x, y, loot, is_found: false });
+        boxes.push(TreasureChest {
+            x,
+            y,
+            loot,
+            is_found: false,
+        });
     }
     boxes
 }
@@ -145,7 +151,7 @@ impl TreasureChest {
     }
 
     pub fn markAsFound(&mut self) {
-        self.is_found= true;
+        self.is_found = true;
     }
 
     pub fn isFound(&self) -> bool {

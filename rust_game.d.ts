@@ -1,4 +1,7 @@
 /* tslint:disable */
+export class TreasureChest {
+free(): void;
+}
 export class Character {
 free(): void;
 static  new_enemy(): Character;
@@ -42,7 +45,4 @@ static  new(arg0: number, arg1: number, arg2: string): World;
 
  tick(arg0: number): any;
 
-}
-export class TreasureChest {
-free(): void;
 }

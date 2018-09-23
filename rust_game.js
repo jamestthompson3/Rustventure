@@ -122,6 +122,24 @@ export function __wbg_error_2c2dd5f14f439749(arg0, arg1) {
 }
 /**
 */
+export class TreasureChest {
+    
+    static __construct(ptr) {
+        return new TreasureChest(ptr);
+    }
+    
+    constructor(ptr) {
+        this.ptr = ptr;
+    }
+    
+    free() {
+        const ptr = this.ptr;
+        this.ptr = 0;
+        wasm.__wbg_treasurechest_free(ptr);
+    }
+}
+/**
+*/
 export class Character {
     
     static __construct(ptr) {
@@ -352,24 +370,6 @@ export class World {
             throw new Error('Attempt to use a moved value');
         }
         return takeObject(wasm.world_tick(this.ptr, arg0));
-    }
-}
-/**
-*/
-export class TreasureChest {
-    
-    static __construct(ptr) {
-        return new TreasureChest(ptr);
-    }
-    
-    constructor(ptr) {
-        this.ptr = ptr;
-    }
-    
-    free() {
-        const ptr = this.ptr;
-        this.ptr = 0;
-        wasm.__wbg_treasurechest_free(ptr);
     }
 }
 
