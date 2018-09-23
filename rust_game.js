@@ -79,6 +79,14 @@ function takeObject(idx) {
     dropRef(idx);
     return ret;
 }
+/**
+* @param {number} arg0
+* @param {number} arg1
+* @returns {number}
+*/
+export function adder(arg0, arg1) {
+    return wasm.adder(arg0, arg1);
+}
 
 const __wbg_time_3127089b3be1de08_target = console.time;
 
@@ -119,6 +127,24 @@ export function __wbg_error_2c2dd5f14f439749(arg0, arg1) {
     wasm.__wbindgen_free(arg0, arg1 * 1);
     
     __wbg_error_2c2dd5f14f439749_target(varg0);
+}
+/**
+*/
+export class TreasureChest {
+    
+    static __construct(ptr) {
+        return new TreasureChest(ptr);
+    }
+    
+    constructor(ptr) {
+        this.ptr = ptr;
+    }
+    
+    free() {
+        const ptr = this.ptr;
+        this.ptr = 0;
+        wasm.__wbg_treasurechest_free(ptr);
+    }
 }
 /**
 */
@@ -229,23 +255,129 @@ export class Character {
         this.ptr = 0;
         wasm.__wbg_character_free(ptr);
     }
-}
-/**
-*/
-export class TreasureChest {
-    
-    static __construct(ptr) {
-        return new TreasureChest(ptr);
+    /**
+    * @returns {Character}
+    */
+    static new_enemy() {
+        return Character.__construct(wasm.character_new_enemy());
     }
-    
-    constructor(ptr) {
-        this.ptr = ptr;
+    /**
+    * @param {string} arg0
+    * @returns {Character}
+    */
+    static new_hero(arg0) {
+        const [ptr0, len0] = passStringToWasm(arg0);
+        return Character.__construct(wasm.character_new_hero(ptr0, len0));
     }
-    
-    free() {
-        const ptr = this.ptr;
-        this.ptr = 0;
-        wasm.__wbg_treasurechest_free(ptr);
+    /**
+    * @returns {string}
+    */
+    name() {
+        if (this.ptr === 0) {
+            throw new Error('Attempt to use a moved value');
+        }
+        const retptr = globalArgumentPtr();
+        wasm.character_name(retptr, this.ptr);
+        const mem = getUint32Memory();
+        const rustptr = mem[retptr / 4];
+        const rustlen = mem[retptr / 4 + 1];
+        
+        const realRet = getStringFromWasm(rustptr, rustlen).slice();
+        wasm.__wbindgen_free(rustptr, rustlen * 1);
+        return realRet;
+        
+    }
+    /**
+    * @returns {Uint32Array}
+    */
+    coords() {
+        if (this.ptr === 0) {
+            throw new Error('Attempt to use a moved value');
+        }
+        const retptr = globalArgumentPtr();
+        wasm.character_coords(retptr, this.ptr);
+        const mem = getUint32Memory();
+        const rustptr = mem[retptr / 4];
+        const rustlen = mem[retptr / 4 + 1];
+        
+        const realRet = getArrayU32FromWasm(rustptr, rustlen).slice();
+        wasm.__wbindgen_free(rustptr, rustlen * 4);
+        return realRet;
+        
+    }
+    /**
+    * @returns {number}
+    */
+    get_class() {
+        if (this.ptr === 0) {
+            throw new Error('Attempt to use a moved value');
+        }
+        return wasm.character_get_class(this.ptr);
+    }
+    /**
+    * @returns {number}
+    */
+    health() {
+        if (this.ptr === 0) {
+            throw new Error('Attempt to use a moved value');
+        }
+        return wasm.character_health(this.ptr);
+    }
+    /**
+    * @param {number} arg0
+    * @returns {void}
+    */
+    take_damage(arg0) {
+        if (this.ptr === 0) {
+            throw new Error('Attempt to use a moved value');
+        }
+        return wasm.character_take_damage(this.ptr, arg0);
+    }
+    /**
+    * @param {number} arg0
+    * @returns {void}
+    */
+    heal(arg0) {
+        if (this.ptr === 0) {
+            throw new Error('Attempt to use a moved value');
+        }
+        return wasm.character_heal(this.ptr, arg0);
+    }
+    /**
+    * @returns {void}
+    */
+    move_left() {
+        if (this.ptr === 0) {
+            throw new Error('Attempt to use a moved value');
+        }
+        return wasm.character_move_left(this.ptr);
+    }
+    /**
+    * @returns {void}
+    */
+    move_right() {
+        if (this.ptr === 0) {
+            throw new Error('Attempt to use a moved value');
+        }
+        return wasm.character_move_right(this.ptr);
+    }
+    /**
+    * @returns {void}
+    */
+    move_down() {
+        if (this.ptr === 0) {
+            throw new Error('Attempt to use a moved value');
+        }
+        return wasm.character_move_down(this.ptr);
+    }
+    /**
+    * @returns {void}
+    */
+    move_up() {
+        if (this.ptr === 0) {
+            throw new Error('Attempt to use a moved value');
+        }
+        return wasm.character_move_up(this.ptr);
     }
 }
 
