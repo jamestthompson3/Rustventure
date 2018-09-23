@@ -1,26 +1,4 @@
 /* tslint:disable */
-export function adder(arg0: number, arg1: number): number;
-
-export class TreasureChest {
-free(): void;
-}
-export class World {
-free(): void;
-static  new(arg0: number, arg1: number, arg2: string): World;
-
- width(): number;
-
- height(): number;
-
- pixels(): number;
-
- get_hero_coords(): Uint32Array;
-
- loot(): any;
-
- tick(arg0: number): void;
-
-}
 export class Character {
 free(): void;
 static  new_enemy(): Character;
@@ -47,4 +25,24 @@ static  new_hero(arg0: string): Character;
 
  move_up(): void;
 
+}
+export class World {
+free(): void;
+static  new(arg0: number, arg1: number, arg2: string): World;
+
+ width(): number;
+
+ height(): number;
+
+ pixels(): number;
+
+ get_hero_coords(): Uint32Array;
+
+ loot(): any;
+
+ tick(arg0: number): any;
+
+}
+export class TreasureChest {
+free(): void;
 }
