@@ -24,6 +24,7 @@ const height = parseInt((window.innerHeight * 0.85).toFixed(2), 10)
 const world = World.new(width, height, 'kevin')
 const hero = Character.new_hero('bob')
 const PIXEL_SIZE = 10
+const banner = document.getElementById('collision')
 
 // setup canvas
 const canvas = document.getElementById('game-canvas')
@@ -44,8 +45,11 @@ const DOWN = [83, 74]
 const bindingsArray = [...LEFT, ...RIGHT, ...UP, ...DOWN]
 const handleMove = e => {
   if (bindingsArray.includes(e.which)) {
-    world.tick(e.which)
+    const tick = world.tick(e.which)
     drawHero()
+    if (typeof tick !== 'string') {
+      renderCollision(tick)
+    }
   }
 }
 
@@ -96,6 +100,19 @@ const drawHero = () => {
   const [x, y] = world.get_hero_coords()
   heroCtx.fillStyle = '#000'
   heroCtx.fillRect(x, y, 6, 6)
+}
+
+const renderCollision = tick => {
+  const type = Object.keys(tick.Treasure.value)[0]
+  banner.style.display = 'block'
+  banner.innerHTML = `You found ${type.replace('"', '')} - ${JSON.stringify(
+    tick.Treasure.value[type]
+  ).replace(/\{|\}|"/g, '')}`
+  setTimeout(hideBanner, 500)
+}
+
+const hideBanner = () => {
+  banner.style.display = 'none'
 }
 
 window.requestAnimationFrame(drawCells)
