@@ -12,6 +12,7 @@ extern crate serde_derive;
 use characters::*;
 use std::*;
 use wasm_bindgen::prelude::*;
+use std::prelude::v1::Vec;
 
 #[wasm_bindgen]
 pub struct World {
@@ -67,7 +68,7 @@ impl World {
     pub fn loot(&self) -> JsValue {
         JsValue::from_serde(&self.loot).unwrap()
     }
-    pub fn tick(&mut self, event_code: u32) {
+    pub fn tick(&mut self, event_code: u32) -> LocationData {
         let _timer = Timer::new("world tick");
         match event_code {
             65 | 72 => {
@@ -82,8 +83,20 @@ impl World {
             83 | 74 => {
                 self.hero.move_down();
             }
-            _ => (),
         }
+
+        // Evaluate new hero location and response with an event about new location.
+        // Currently location can be either treasure or enemies.
+        let new_pos = self.hero.coords();
+
+        let mut location_data : LocationData = LocationData:None;
+        for treasure in self.loot.iter() {
+            if new_pos.get(0) == treasure.x && new_pos.get(1) == treasure.y {
+                location_data = LocationData::Treasure( treasure )
+            }
+        }
+
+        location_data
     }
 }
 
@@ -137,6 +150,13 @@ pub enum Treasure {
     Trap { damage: u32 },
     Key { quantity: u8, name: String },
     Arrow { quantity: u32 },
+}
+
+#[repr(u8)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+pub enum LocationData {
+    Treasure{ value: Treasure },
+    None,
 }
 
 #[wasm_bindgen]
