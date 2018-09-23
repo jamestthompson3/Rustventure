@@ -4,7 +4,7 @@
 extern crate console_error_panic_hook;
 extern crate rand;
 extern crate wasm_bindgen;
-mod characters;
+pub mod characters;
 
 #[macro_use]
 extern crate serde_derive;
@@ -87,7 +87,6 @@ impl World {
     }
 }
 
-// TODO randomly assign values for treasure items also this part causes the wasm to fail :/
 fn seed_loot(_height: &u32, _width: &u32) -> Vec<TreasureChest> {
     let num_boxes: u32 = 15;
     let mut boxes = Vec::new();
@@ -112,6 +111,10 @@ fn seed_loot(_height: &u32, _width: &u32) -> Vec<TreasureChest> {
     boxes
 }
 
+#[wasm_bindgen]
+pub fn adder(a: u8, b: u8) -> u8 {
+    a + b
+}
 #[wasm_bindgen]
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct TreasureChest {

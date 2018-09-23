@@ -14,10 +14,16 @@ body {
 canvas {
     border-radius; 5px;
 }
+.canvas-container {
+  margin: auto;
+}
 </style>
     <body>
         <h1 style="text-align: center;">Welcome to Rustventure World!</h1>
-        <canvas id="game-canvas"></canvas>
+        <div class="canvas-container">
+          <canvas id="hero-canvas" style="position: absolute;"></canvas>
+          <canvas id="game-canvas"></canvas>
+        </div>
         <script src='./bootstrap.js'></script>
     </body>
 </html>
