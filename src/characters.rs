@@ -77,16 +77,16 @@ impl Character {
             self.health + heal
         }
     }
-    pub fn move_left(&mut self) {
-        self.x = if self.x == 0 { 0 } else { self.x - 1 }
+    pub fn move_left(&mut self, width: u32) {
+        self.x = if self.x == 0 { width } else { self.x - 1 }
     }
-    pub fn move_right(&mut self) {
-        self.x = self.x + 1
+    pub fn move_right(&mut self, width: u32) {
+        self.x = if self.x == width { 0 } else { self.x + 1 }
     }
-    pub fn move_down(&mut self) {
-        self.y = self.y + 1
+    pub fn move_down(&mut self, height: u32) {
+        self.y = if self.y == height { 0 } else { self.y + 1 }
     }
-    pub fn move_up(&mut self) {
-        self.y = if self.y == 0 { 0 } else { self.y - 1 }
+    pub fn move_up(&mut self, height: u32) {
+        self.y = if self.y == 0 { height } else { self.y - 1 }
     }
 }

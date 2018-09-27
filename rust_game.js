@@ -122,24 +122,6 @@ export function __wbg_error_2c2dd5f14f439749(arg0, arg1) {
 }
 /**
 */
-export class TreasureChest {
-    
-    static __construct(ptr) {
-        return new TreasureChest(ptr);
-    }
-    
-    constructor(ptr) {
-        this.ptr = ptr;
-    }
-    
-    free() {
-        const ptr = this.ptr;
-        this.ptr = 0;
-        wasm.__wbg_treasurechest_free(ptr);
-    }
-}
-/**
-*/
 export class Character {
     
     static __construct(ptr) {
@@ -244,40 +226,62 @@ export class Character {
         return wasm.character_heal(this.ptr, arg0);
     }
     /**
+    * @param {number} arg0
     * @returns {void}
     */
-    move_left() {
+    move_left(arg0) {
         if (this.ptr === 0) {
             throw new Error('Attempt to use a moved value');
         }
-        return wasm.character_move_left(this.ptr);
+        return wasm.character_move_left(this.ptr, arg0);
     }
     /**
+    * @param {number} arg0
     * @returns {void}
     */
-    move_right() {
+    move_right(arg0) {
         if (this.ptr === 0) {
             throw new Error('Attempt to use a moved value');
         }
-        return wasm.character_move_right(this.ptr);
+        return wasm.character_move_right(this.ptr, arg0);
     }
     /**
+    * @param {number} arg0
     * @returns {void}
     */
-    move_down() {
+    move_down(arg0) {
         if (this.ptr === 0) {
             throw new Error('Attempt to use a moved value');
         }
-        return wasm.character_move_down(this.ptr);
+        return wasm.character_move_down(this.ptr, arg0);
     }
     /**
+    * @param {number} arg0
     * @returns {void}
     */
-    move_up() {
+    move_up(arg0) {
         if (this.ptr === 0) {
             throw new Error('Attempt to use a moved value');
         }
-        return wasm.character_move_up(this.ptr);
+        return wasm.character_move_up(this.ptr, arg0);
+    }
+}
+/**
+*/
+export class TreasureChest {
+    
+    static __construct(ptr) {
+        return new TreasureChest(ptr);
+    }
+    
+    constructor(ptr) {
+        this.ptr = ptr;
+    }
+    
+    free() {
+        const ptr = this.ptr;
+        this.ptr = 0;
+        wasm.__wbg_treasurechest_free(ptr);
     }
 }
 /**

@@ -72,16 +72,16 @@ impl World {
         let _timer = Timer::new("world tick");
         match event_code {
             65 | 72 => {
-                self.hero.move_left();
+                self.hero.move_left(self.width);
             }
             68 | 76 => {
-                self.hero.move_right();
+                self.hero.move_right(self.width);
             }
             87 | 75 => {
-                self.hero.move_up();
+                self.hero.move_up(self.height);
             }
             83 | 74 => {
-                self.hero.move_down();
+                self.hero.move_down(self.height);
             }
             _ => (),
         }

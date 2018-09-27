@@ -1,7 +1,4 @@
 /* tslint:disable */
-export class TreasureChest {
-free(): void;
-}
 export class Character {
 free(): void;
 static  new_enemy(): Character;
@@ -20,14 +17,17 @@ static  new_hero(arg0: string): Character;
 
  heal(arg0: number): void;
 
- move_left(): void;
+ move_left(arg0: number): void;
 
- move_right(): void;
+ move_right(arg0: number): void;
 
- move_down(): void;
+ move_down(arg0: number): void;
 
- move_up(): void;
+ move_up(arg0: number): void;
 
+}
+export class TreasureChest {
+free(): void;
 }
 export class World {
 free(): void;
