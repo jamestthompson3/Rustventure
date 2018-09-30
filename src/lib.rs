@@ -1,4 +1,3 @@
-#![feature(use_extern_macros)]
 #![feature(exclusive_range_pattern)]
 
 extern crate console_error_panic_hook;
@@ -11,7 +10,6 @@ extern crate serde_derive;
 
 use characters::*;
 use std::prelude::v1::Vec;
-use std::*;
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
@@ -21,6 +19,7 @@ pub struct World {
     pixels: Vec<Pixel>,
     hero: Character,
     loot: Vec<TreasureChest>,
+    enemies: Vec<Character>,
 }
 
 // TODO generate a better map
@@ -39,11 +38,16 @@ impl World {
                 } else {
                     Pixel::Grass
                 }
-            }).collect();
+            })
+            .collect();
 
         let loot = seed_loot(&width, &height);
 
         let hero = Character::new_hero(hero_name);
+        let mut enemies = Vec::new();
+        for i in 0..10 {
+            enemies.push(Character::new_enemy(i % 3 * 10, i % 2));
+        }
 
         World {
             width,
@@ -51,6 +55,7 @@ impl World {
             pixels,
             hero,
             loot,
+            enemies,
         }
     }
     pub fn width(&self) -> u32 {
@@ -70,6 +75,9 @@ impl World {
     }
     pub fn loot(&self) -> JsValue {
         JsValue::from_serde(&self.loot).unwrap()
+    }
+    pub fn enemies(&self) -> JsValue {
+        JsValue::from_serde(&self.enemies).unwrap()
     }
     pub fn tick(&mut self, event_code: u32) -> JsValue {
         let _timer = Timer::new("world tick");
@@ -98,9 +106,9 @@ impl World {
         for treasure in self.loot.iter_mut() {
             if *new_pos.get(0).unwrap() == treasure.x
                 && *new_pos.get(1).unwrap() == treasure.y
-                && !treasure.isFound()
+                && !treasure.is_found()
             {
-                treasure.markAsFound();
+                treasure.mark_as_found();
                 location_data = LocationData::Treasure {
                     value: treasure.get_treasure(),
                 }
@@ -115,9 +123,9 @@ fn seed_loot(_height: &u32, _width: &u32) -> Vec<TreasureChest> {
     let mut boxes = Vec::new();
 
     for n in 0..num_boxes {
-        let x: u32 = n % 3;
+        let x: u32 = n % 3 * 20;
         let y: u32 = n % 4 * 10;
-        let contents_gen: u32 = random() as u32 * 10;
+        let contents_gen: u32 = random() as u32 * 100;
         let loot = match contents_gen {
             0 => Treasure::Potion { value: 2 },
             1 => Treasure::Key {
@@ -153,11 +161,11 @@ impl TreasureChest {
         self.loot.clone()
     }
 
-    pub fn markAsFound(&mut self) {
+    pub fn mark_as_found(&mut self) {
         self.is_found = true;
     }
 
-    pub fn isFound(&self) -> bool {
+    pub fn is_found(&self) -> bool {
         self.is_found
     }
 }

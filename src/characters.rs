@@ -1,17 +1,15 @@
-#![feature(use_extern_macros)]
-#![feature(exclusive_range_pattern)]
-
 extern crate wasm_bindgen;
 
 use wasm_bindgen::prelude::*;
 
-//#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
 enum Classification {
     Hero,
     Enemy,
 }
 
 #[wasm_bindgen]
+#[derive(Serialize)]
 pub struct Character {
     x: u32,
     y: u32,
@@ -22,10 +20,8 @@ pub struct Character {
 
 #[wasm_bindgen]
 impl Character {
-    pub fn new_enemy() -> Character {
+    pub fn new_enemy(x: u32, y: u32) -> Character {
         let health = 40;
-        let x = 0;
-        let y = 0;
         let class = Classification::Enemy;
         Character {
             x,

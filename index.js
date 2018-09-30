@@ -92,6 +92,11 @@ const drawCells = () => {
     ctx.fillStyle = '#ffe030'
     ctx.fillRect(box.x, box.y, 8, 8)
   })
+  const enemies = world.enemies()
+  enemies.forEach(enemy => {
+    ctx.fillStyle = '#BAD'
+    ctx.fillRect(enemy.x, enemy.y, 8, 8)
+  })
 }
 
 const drawHero = () => {
@@ -99,7 +104,7 @@ const drawHero = () => {
   // hero
   const [x, y] = world.get_hero_coords()
   heroCtx.fillStyle = '#000'
-  heroCtx.fillRect(x, y, 6, 6)
+  heroCtx.fillRect(x, y, 10, 10)
   // health
   healthBar.style.width = `${world.get_hero_health()}%`
 }

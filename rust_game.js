@@ -122,6 +122,134 @@ export function __wbg_error_2c2dd5f14f439749(arg0, arg1) {
 }
 /**
 */
+export class World {
+    
+    static __construct(ptr) {
+        return new World(ptr);
+    }
+    
+    constructor(ptr) {
+        this.ptr = ptr;
+    }
+    
+    free() {
+        const ptr = this.ptr;
+        this.ptr = 0;
+        wasm.__wbg_world_free(ptr);
+    }
+    /**
+    * @param {number} arg0
+    * @param {number} arg1
+    * @param {string} arg2
+    * @returns {World}
+    */
+    static new(arg0, arg1, arg2) {
+        const [ptr2, len2] = passStringToWasm(arg2);
+        return World.__construct(wasm.world_new(arg0, arg1, ptr2, len2));
+    }
+    /**
+    * @returns {number}
+    */
+    width() {
+        if (this.ptr === 0) {
+            throw new Error('Attempt to use a moved value');
+        }
+        return wasm.world_width(this.ptr);
+    }
+    /**
+    * @returns {number}
+    */
+    height() {
+        if (this.ptr === 0) {
+            throw new Error('Attempt to use a moved value');
+        }
+        return wasm.world_height(this.ptr);
+    }
+    /**
+    * @returns {number}
+    */
+    pixels() {
+        if (this.ptr === 0) {
+            throw new Error('Attempt to use a moved value');
+        }
+        return wasm.world_pixels(this.ptr);
+    }
+    /**
+    * @returns {number}
+    */
+    get_hero_health() {
+        if (this.ptr === 0) {
+            throw new Error('Attempt to use a moved value');
+        }
+        return wasm.world_get_hero_health(this.ptr);
+    }
+    /**
+    * @returns {Uint32Array}
+    */
+    get_hero_coords() {
+        if (this.ptr === 0) {
+            throw new Error('Attempt to use a moved value');
+        }
+        const retptr = globalArgumentPtr();
+        wasm.world_get_hero_coords(retptr, this.ptr);
+        const mem = getUint32Memory();
+        const rustptr = mem[retptr / 4];
+        const rustlen = mem[retptr / 4 + 1];
+        
+        const realRet = getArrayU32FromWasm(rustptr, rustlen).slice();
+        wasm.__wbindgen_free(rustptr, rustlen * 4);
+        return realRet;
+        
+    }
+    /**
+    * @returns {any}
+    */
+    loot() {
+        if (this.ptr === 0) {
+            throw new Error('Attempt to use a moved value');
+        }
+        return takeObject(wasm.world_loot(this.ptr));
+    }
+    /**
+    * @returns {any}
+    */
+    enemies() {
+        if (this.ptr === 0) {
+            throw new Error('Attempt to use a moved value');
+        }
+        return takeObject(wasm.world_enemies(this.ptr));
+    }
+    /**
+    * @param {number} arg0
+    * @returns {any}
+    */
+    tick(arg0) {
+        if (this.ptr === 0) {
+            throw new Error('Attempt to use a moved value');
+        }
+        return takeObject(wasm.world_tick(this.ptr, arg0));
+    }
+}
+/**
+*/
+export class TreasureChest {
+    
+    static __construct(ptr) {
+        return new TreasureChest(ptr);
+    }
+    
+    constructor(ptr) {
+        this.ptr = ptr;
+    }
+    
+    free() {
+        const ptr = this.ptr;
+        this.ptr = 0;
+        wasm.__wbg_treasurechest_free(ptr);
+    }
+}
+/**
+*/
 export class Character {
     
     static __construct(ptr) {
@@ -138,10 +266,12 @@ export class Character {
         wasm.__wbg_character_free(ptr);
     }
     /**
+    * @param {number} arg0
+    * @param {number} arg1
     * @returns {Character}
     */
-    static new_enemy() {
-        return Character.__construct(wasm.character_new_enemy());
+    static new_enemy(arg0, arg1) {
+        return Character.__construct(wasm.character_new_enemy(arg0, arg1));
     }
     /**
     * @param {string} arg0
@@ -264,125 +394,6 @@ export class Character {
             throw new Error('Attempt to use a moved value');
         }
         return wasm.character_move_up(this.ptr, arg0);
-    }
-}
-/**
-*/
-export class World {
-    
-    static __construct(ptr) {
-        return new World(ptr);
-    }
-    
-    constructor(ptr) {
-        this.ptr = ptr;
-    }
-    
-    free() {
-        const ptr = this.ptr;
-        this.ptr = 0;
-        wasm.__wbg_world_free(ptr);
-    }
-    /**
-    * @param {number} arg0
-    * @param {number} arg1
-    * @param {string} arg2
-    * @returns {World}
-    */
-    static new(arg0, arg1, arg2) {
-        const [ptr2, len2] = passStringToWasm(arg2);
-        return World.__construct(wasm.world_new(arg0, arg1, ptr2, len2));
-    }
-    /**
-    * @returns {number}
-    */
-    width() {
-        if (this.ptr === 0) {
-            throw new Error('Attempt to use a moved value');
-        }
-        return wasm.world_width(this.ptr);
-    }
-    /**
-    * @returns {number}
-    */
-    height() {
-        if (this.ptr === 0) {
-            throw new Error('Attempt to use a moved value');
-        }
-        return wasm.world_height(this.ptr);
-    }
-    /**
-    * @returns {number}
-    */
-    pixels() {
-        if (this.ptr === 0) {
-            throw new Error('Attempt to use a moved value');
-        }
-        return wasm.world_pixels(this.ptr);
-    }
-    /**
-    * @returns {number}
-    */
-    get_hero_health() {
-        if (this.ptr === 0) {
-            throw new Error('Attempt to use a moved value');
-        }
-        return wasm.world_get_hero_health(this.ptr);
-    }
-    /**
-    * @returns {Uint32Array}
-    */
-    get_hero_coords() {
-        if (this.ptr === 0) {
-            throw new Error('Attempt to use a moved value');
-        }
-        const retptr = globalArgumentPtr();
-        wasm.world_get_hero_coords(retptr, this.ptr);
-        const mem = getUint32Memory();
-        const rustptr = mem[retptr / 4];
-        const rustlen = mem[retptr / 4 + 1];
-        
-        const realRet = getArrayU32FromWasm(rustptr, rustlen).slice();
-        wasm.__wbindgen_free(rustptr, rustlen * 4);
-        return realRet;
-        
-    }
-    /**
-    * @returns {any}
-    */
-    loot() {
-        if (this.ptr === 0) {
-            throw new Error('Attempt to use a moved value');
-        }
-        return takeObject(wasm.world_loot(this.ptr));
-    }
-    /**
-    * @param {number} arg0
-    * @returns {any}
-    */
-    tick(arg0) {
-        if (this.ptr === 0) {
-            throw new Error('Attempt to use a moved value');
-        }
-        return takeObject(wasm.world_tick(this.ptr, arg0));
-    }
-}
-/**
-*/
-export class TreasureChest {
-    
-    static __construct(ptr) {
-        return new TreasureChest(ptr);
-    }
-    
-    constructor(ptr) {
-        this.ptr = ptr;
-    }
-    
-    free() {
-        const ptr = this.ptr;
-        this.ptr = 0;
-        wasm.__wbg_treasurechest_free(ptr);
     }
 }
 
