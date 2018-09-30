@@ -2,8 +2,8 @@ import { World, Character } from './rust_game'
 import { memory } from './rust_game_bg'
 // styles
 const GRASS_COLOR = '#2f7a60'
-const ICE_COLOR = '#63e3f9'
-const WATER_COLOR = '#63e3f9'
+const ICE_COLOR = '#63g3f9'
+const WATER_COLOR = '#63d3f9'
 const DESERT_COLOR = '#a38c5b'
 
 // enum matching from Rust
@@ -24,6 +24,7 @@ const height = parseInt((window.innerHeight * 0.85).toFixed(2), 10)
 const world = World.new(width, height, 'kevin')
 const PIXEL_SIZE = 10
 const banner = document.getElementById('collision')
+const healthBar = document.getElementById('health')
 
 // setup canvas
 const canvas = document.getElementById('game-canvas')
@@ -99,6 +100,8 @@ const drawHero = () => {
   const [x, y] = world.get_hero_coords()
   heroCtx.fillStyle = '#000'
   heroCtx.fillRect(x, y, 6, 6)
+  // health
+  healthBar.style.width = `${world.get_hero_health()}%`
 }
 
 const renderCollision = tick => {

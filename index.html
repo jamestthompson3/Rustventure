@@ -28,9 +28,24 @@ canvas {
   border: 2px solid #000;
   display: none;
 }
+.bar {
+  border-radius: 7px;
+  border: 1px solid #dbdbdb;
+  height: 15px;
+  width: 30%;
+}
+#health {
+  height: 100%;
+  background: #fc255b;
+  border-radius: 7px;
+}
+
 </style>
     <body>
         <h1 style="text-align: center; color: #dbdbdb;">Welcome to Rustventure World!</h1>
+        <div class="bar">
+          <div id="health"></div>
+        </div>
         <div class="collision" id="collision" >
           </div>
         <div class="canvas-container">

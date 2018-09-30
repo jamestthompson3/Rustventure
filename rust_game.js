@@ -268,24 +268,6 @@ export class Character {
 }
 /**
 */
-export class TreasureChest {
-    
-    static __construct(ptr) {
-        return new TreasureChest(ptr);
-    }
-    
-    constructor(ptr) {
-        this.ptr = ptr;
-    }
-    
-    free() {
-        const ptr = this.ptr;
-        this.ptr = 0;
-        wasm.__wbg_treasurechest_free(ptr);
-    }
-}
-/**
-*/
 export class World {
     
     static __construct(ptr) {
@@ -339,6 +321,15 @@ export class World {
         return wasm.world_pixels(this.ptr);
     }
     /**
+    * @returns {number}
+    */
+    get_hero_health() {
+        if (this.ptr === 0) {
+            throw new Error('Attempt to use a moved value');
+        }
+        return wasm.world_get_hero_health(this.ptr);
+    }
+    /**
     * @returns {Uint32Array}
     */
     get_hero_coords() {
@@ -374,6 +365,24 @@ export class World {
             throw new Error('Attempt to use a moved value');
         }
         return takeObject(wasm.world_tick(this.ptr, arg0));
+    }
+}
+/**
+*/
+export class TreasureChest {
+    
+    static __construct(ptr) {
+        return new TreasureChest(ptr);
+    }
+    
+    constructor(ptr) {
+        this.ptr = ptr;
+    }
+    
+    free() {
+        const ptr = this.ptr;
+        this.ptr = 0;
+        wasm.__wbg_treasurechest_free(ptr);
     }
 }
 

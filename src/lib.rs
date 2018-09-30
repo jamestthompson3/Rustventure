@@ -62,6 +62,9 @@ impl World {
     pub fn pixels(&self) -> *const Pixel {
         self.pixels.as_ptr()
     }
+    pub fn get_hero_health(&self) -> u32 {
+        return self.hero.health();
+    }
     pub fn get_hero_coords(&self) -> Vec<u32> {
         return self.hero.coords();
     }
