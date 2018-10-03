@@ -13,108 +13,34 @@ use std::prelude::v1::Vec;
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
-pub struct World {
-    width: u32,
-    height: u32,
-    pixels: Vec<Pixel>,
-    hero: Character,
-    loot: Vec<TreasureChest>,
-    enemies: Vec<Character>,
+pub fn start_game(width: u32, height: u32, hero_name: String) -> Game {
+    let world = intialize_world(width, height);
+    let state = set_initial_game_state(hero_name);
+    Game { world, state }
 }
 
 // TODO generate a better map
-#[wasm_bindgen]
-impl World {
-    pub fn new(width: u32, height: u32, hero_name: String) -> World {
-        console_error_panic_hook::set_once();
-        let pixels: Vec<Pixel> = (0..width * height)
-            .map(|i| {
-                if i % 7 == 0 {
-                    Pixel::Desert
-                } else if i % 4 == 0 || i % 3 == 1 {
-                    Pixel::Grass
-                } else if i % 5 == 0 {
-                    Pixel::Water
-                } else {
-                    Pixel::Grass
-                }
-            })
-            .collect();
-
-        let loot = seed_loot(&width, &height);
-
-        let hero = Character::new_hero(hero_name);
-        let mut enemies = Vec::new();
-        for i in 0..10 {
-            enemies.push(Character::new_enemy(i % 3 * 10, i % 2));
-        }
-
-        World {
-            width,
-            height,
-            pixels,
-            hero,
-            loot,
-            enemies,
-        }
-    }
-    pub fn width(&self) -> u32 {
-        self.width
-    }
-    pub fn height(&self) -> u32 {
-        self.height
-    }
-    pub fn pixels(&self) -> *const Pixel {
-        self.pixels.as_ptr()
-    }
-    pub fn get_hero_health(&self) -> u32 {
-        return self.hero.health();
-    }
-    pub fn get_hero_coords(&self) -> Vec<u32> {
-        return self.hero.coords();
-    }
-    pub fn loot(&self) -> JsValue {
-        JsValue::from_serde(&self.loot).unwrap()
-    }
-    pub fn enemies(&self) -> JsValue {
-        JsValue::from_serde(&self.enemies).unwrap()
-    }
-    pub fn tick(&mut self, event_code: u32) -> JsValue {
-        let _timer = Timer::new("world tick");
-        match event_code {
-            65 | 72 => {
-                self.hero.move_left(self.width);
+fn intialize_world(width: u32, height: u32) -> World {
+    console_error_panic_hook::set_once();
+    let pixels: Vec<Pixel> = (0..width * height)
+        .map(|i| {
+            if i % 7 == 0 {
+                Pixel::Desert
+            } else if i % 4 == 0 || i % 3 == 1 {
+                Pixel::Grass
+            } else if i % 5 == 0 {
+                Pixel::Water
+            } else {
+                Pixel::Grass
             }
-            68 | 76 => {
-                self.hero.move_right(self.width);
-            }
-            87 | 75 => {
-                self.hero.move_up(self.height);
-            }
-            83 | 74 => {
-                self.hero.move_down(self.height);
-            }
-            _ => (),
-        }
-
-        // Evaluate new hero location and response with an event about new location.
-        // Currently location can be either treasure or enemies.
-        let new_pos = self.hero.coords();
-
-        let mut location_data: LocationData = LocationData::None;
-
-        for treasure in self.loot.iter_mut() {
-            if *new_pos.get(0).unwrap() == treasure.x
-                && *new_pos.get(1).unwrap() == treasure.y
-                && !treasure.is_found()
-            {
-                treasure.mark_as_found();
-                location_data = LocationData::Treasure {
-                    value: treasure.get_treasure(),
-                }
-            }
-        }
-        JsValue::from_serde(&location_data).unwrap()
+        })
+        .collect();
+    let loot = seed_loot(&width, &height);
+    World {
+        width,
+        height,
+        pixels,
+        loot,
     }
 }
 
@@ -147,9 +73,98 @@ fn seed_loot(_height: &u32, _width: &u32) -> Vec<TreasureChest> {
     boxes
 }
 
+fn set_initial_game_state(hero_name: String) -> GameState {
+    let mut enemies = Vec::new();
+    for i in 0..10 {
+        enemies.push(Character::new_enemy(i % 3 * 10, i % 2));
+    }
+    let player = Character::new_hero(hero_name);
+
+    GameState { player, enemies }
+}
+
+#[wasm_bindgen]
+impl Game {
+    pub fn tick(&mut self, event_code: u32) -> JsValue {
+        let _timer = Timer::new("game tick");
+        match event_code {
+            65 | 72 => {
+                self.state.player.move_left(self.world.width);
+            }
+            68 | 76 => {
+                self.state.player.move_right(self.world.width);
+            }
+            87 | 75 => {
+                self.state.player.move_up(self.world.height);
+            }
+            83 | 74 => {
+                self.state.player.move_down(self.world.height);
+            }
+            _ => (),
+        }
+        // Evaluate new player location and response with an event about new location.
+        // Currently location can be either treasure or enemies.
+        // TODO implement for enemies
+        //pub fn enemies(&self) -> JsValue {
+        // JsValue::from_serde(&self.enemies).unwrap()
+        // }
+
+        let new_pos = self.state.player.coords();
+
+        let mut location_data: LocationData = LocationData::None;
+
+        for treasure in self.world.loot.iter_mut() {
+            if *new_pos.get(0).unwrap() == treasure.x
+                && *new_pos.get(1).unwrap() == treasure.y
+                && !treasure.is_found()
+            {
+                treasure.mark_as_found();
+                location_data = LocationData::Treasure {
+                    value: treasure.get_treasure(),
+                }
+            }
+        }
+        JsValue::from_serde(&location_data).unwrap()
+    }
+    pub fn get_world_pixels(&self) -> *const Pixel {
+        self.world.pixels()
+    }
+    pub fn loot(&self) -> JsValue {
+        self.world.loot()
+    }
+}
+
+#[wasm_bindgen]
+impl World {
+    pub fn pixels(&self) -> *const Pixel {
+        self.pixels.as_ptr()
+    }
+    pub fn loot(&self) -> JsValue {
+        JsValue::from_serde(&self.loot).unwrap()
+    }
+}
+
+#[wasm_bindgen]
+pub struct Game {
+    world: World,
+    state: GameState,
+}
+
+struct World {
+    width: u32,
+    height: u32,
+    loot: Vec<TreasureChest>,
+    pixels: Vec<Pixel>,
+}
+
+struct GameState {
+    enemies: Vec<Character>,
+    player: Character,
+}
+
 #[wasm_bindgen]
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
-pub struct TreasureChest {
+struct TreasureChest {
     x: u32,
     y: u32,
     loot: Treasure,
@@ -181,7 +196,7 @@ pub enum Pixel {
 
 #[repr(u8)]
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
-pub enum Treasure {
+enum Treasure {
     Gold { value: u32 },
     Potion { value: u32 },
     Trap { damage: u32 },
@@ -191,7 +206,7 @@ pub enum Treasure {
 
 #[repr(u8)]
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
-pub enum LocationData {
+enum LocationData {
     Treasure { value: Treasure },
     None,
 }

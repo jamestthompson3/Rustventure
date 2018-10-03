@@ -1,4 +1,4 @@
-import { World, Character } from './rust_game'
+import { Game, start_game } from './rust_game'
 import { memory } from './rust_game_bg'
 // styles
 const GRASS_COLOR = '#2f7a60'
@@ -21,7 +21,7 @@ const getRandomIntInclusive = (min, max) => {
 // create game map
 const width = parseInt((window.innerWidth * 0.85).toFixed(2), 10)
 const height = parseInt((window.innerHeight * 0.85).toFixed(2), 10)
-const world = World.new(width, height, 'kevin')
+const game = start_game(width, height, 'kevin')
 const PIXEL_SIZE = 10
 const banner = document.getElementById('collision')
 const healthBar = document.getElementById('health')
@@ -45,7 +45,7 @@ const DOWN = [83, 74]
 const bindingsArray = [...LEFT, ...RIGHT, ...UP, ...DOWN]
 const handleMove = e => {
   if (bindingsArray.includes(e.which)) {
-    const tick = world.tick(e.which)
+    const tick = game.tick(e.which)
     drawHero()
     if (typeof tick !== 'string') {
       renderCollision(tick)
@@ -59,7 +59,7 @@ const getIndex = (row, column) => row * width + column
 
 const drawCells = () => {
   ctx.clearRect(0, 0, width, height)
-  const cellsPtr = world.pixels()
+  const cellsPtr = game.get_world_pixels()
   const cells = new Uint8Array(memory.buffer, cellsPtr, width * height)
 
   const drawPixel = type => {
@@ -87,26 +87,26 @@ const drawCells = () => {
   ctx.fillStyle = ICE_COLOR
   drawPixel(ICE)
   // loot
-  const boxes = world.loot()
+  const boxes = game.loot()
   boxes.forEach(box => {
     ctx.fillStyle = '#ffe030'
     ctx.fillRect(box.x, box.y, 8, 8)
   })
-  const enemies = world.enemies()
-  enemies.forEach(enemy => {
-    ctx.fillStyle = '#BAD'
-    ctx.fillRect(enemy.x, enemy.y, 8, 8)
-  })
+  // const enemies = world.enemies()
+  // enemies.forEach(enemy => {
+  //   ctx.fillStyle = '#BAD'
+  //   ctx.fillRect(enemy.x, enemy.y, 8, 8)
+  // })
 }
 
 const drawHero = () => {
   heroCtx.clearRect(0, 0, width, height)
   // hero
-  const [x, y] = world.get_hero_coords()
+  const [x, y] = game.state.player.coords()
   heroCtx.fillStyle = '#000'
   heroCtx.fillRect(x, y, 10, 10)
   // health
-  healthBar.style.width = `${world.get_hero_health()}%`
+  healthBar.style.width = `${game.state.player.health()}%`
 }
 
 const renderCollision = tick => {
