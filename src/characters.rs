@@ -8,6 +8,33 @@ enum Classification {
     Enemy,
 }
 
+#[derive(Serialize)]
+struct Weapon {
+    name: String,
+    damage: u8,
+}
+
+#[derive(Serialize)]
+struct Potion {
+    name: String,
+    effect: PotionEffect,
+    effect_multiplier: u8,
+}
+
+#[derive(Serialize)]
+enum PotionEffect {
+    Heal,
+    Damage,
+    Special,
+}
+
+#[derive(Serialize)]
+struct Inventory {
+    weapon: Option<Weapon>,
+    potion: Option<Potion>,
+    gold: u8,
+}
+
 #[wasm_bindgen]
 #[derive(Serialize)]
 pub struct Character {
@@ -16,6 +43,7 @@ pub struct Character {
     health: u32,
     classification: Classification,
     name: String,
+    inventory: Inventory,
 }
 
 #[wasm_bindgen]
@@ -23,11 +51,17 @@ impl Character {
     pub fn new_enemy(x: u32, y: u32) -> Character {
         let health = 40;
         let class = Classification::Enemy;
+        let starting_inventory = Inventory {
+            weapon: None,
+            potion: None,
+            gold: 10,
+        };
         Character {
             x,
             y,
             health,
             classification: class,
+            inventory: starting_inventory,
             name: String::from("enemy"),
         }
     }
@@ -36,11 +70,18 @@ impl Character {
         let x = 0;
         let y = 0;
         let class = Classification::Hero;
+        // TODO create better enemy inventory
+        let starting_inventory = Inventory {
+            weapon: None,
+            potion: None,
+            gold: 15,
+        };
         Character {
             x,
             y,
             health,
             classification: class,
+            inventory: starting_inventory,
             name,
         }
     }

@@ -105,7 +105,7 @@ impl Game {
         // Evaluate new player location and response with an event about new location.
         // Currently location can be either treasure or enemies.
         // TODO implement for enemies
-        //pub fn enemies(&self) -> JsValue {
+        // pub fn enemies(&self) -> JsValue {
         // JsValue::from_serde(&self.enemies).unwrap()
         // }
 
@@ -134,7 +134,6 @@ impl Game {
     }
 }
 
-#[wasm_bindgen]
 impl World {
     pub fn pixels(&self) -> *const Pixel {
         self.pixels.as_ptr()
