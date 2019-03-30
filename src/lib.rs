@@ -1,6 +1,7 @@
 #![feature(exclusive_range_pattern)]
 
 extern crate console_error_panic_hook;
+extern crate js_sys;
 extern crate rand;
 extern crate wasm_bindgen;
 pub mod characters;
@@ -24,11 +25,11 @@ fn intialize_world(width: u32, height: u32) -> World {
     console_error_panic_hook::set_once();
     let pixels: Vec<Pixel> = (0..width * height)
         .map(|i| {
-            if i % 7 == 0 {
+            if i * (js_sys::Math::random() * width as f64) as u32 % 3 == 0 {
                 Pixel::Desert
-            } else if i % 4 == 0 || i % 3 == 1 {
+            } else if (i as f64 * js_sys::Math::random() * 100 as f64) as u32 % 3 == 1 {
                 Pixel::Grass
-            } else if i % 5 == 0 {
+            } else if (i as f64 * js_sys::Math::random() * 340 as f64) as u32 % 5 == 0  {
                 Pixel::Water
             } else {
                 Pixel::Grass
@@ -86,7 +87,6 @@ fn set_initial_game_state(hero_name: String) -> GameState {
 #[wasm_bindgen]
 impl Game {
     pub fn tick(&mut self, event_code: u32) -> JsValue {
-        let _timer = Timer::new("game tick");
         match event_code {
             65 | 72 => {
                 self.state.player.move_left(self.world.width);
@@ -129,6 +129,9 @@ impl Game {
     pub fn get_world_pixels(&self) -> *const Pixel {
         self.world.pixels()
     }
+    pub fn get_state(&self) -> JsValue {
+        JsValue::from_serde(&self.state).unwrap()
+    }
     pub fn loot(&self) -> JsValue {
         self.world.loot()
     }
@@ -156,6 +159,7 @@ struct World {
     pixels: Vec<Pixel>,
 }
 
+#[derive(Serialize)]
 struct GameState {
     enemies: Vec<Character>,
     player: Character,

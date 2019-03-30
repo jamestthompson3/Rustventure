@@ -1,52 +1,39 @@
 /* tslint:disable */
-export class World {
-free(): void;
-static  new(arg0: number, arg1: number, arg2: string): World;
-
- width(): number;
-
- height(): number;
-
- pixels(): number;
-
- get_hero_health(): number;
-
- get_hero_coords(): Uint32Array;
-
- loot(): any;
-
- enemies(): any;
-
- tick(arg0: number): any;
-
-}
-export class TreasureChest {
-free(): void;
-}
+/**
+* @param {number} width 
+* @param {number} height 
+* @param {string} hero_name 
+* @returns {Game} 
+*/
+export function start_game(width: number, height: number, hero_name: string): Game;
+/**
+*/
 export class Character {
-free(): void;
-static  new_enemy(arg0: number, arg1: number): Character;
+  free(): void;
+  static new_enemy(x: number, y: number): Character;
+  static new_hero(name: string): Character;
+  name(): string;
+  coords(): Uint32Array;
+  get_class(): number;
+  health(): number;
+  take_damage(hit: number): void;
+  heal(heal: number): void;
+  move_left(width: number): void;
+  move_right(width: number): void;
+  move_down(height: number): void;
+  move_up(height: number): void;
+}
+/**
+*/
+export class Game {
+  free(): void;  tick(event_code: number): any;
+  get_world_pixels(): number;
+  get_state(): any;
+  loot(): any;
 
-static  new_hero(arg0: string): Character;
-
- name(): string;
-
- coords(): Uint32Array;
-
- get_class(): number;
-
- health(): number;
-
- take_damage(arg0: number): void;
-
- heal(arg0: number): void;
-
- move_left(arg0: number): void;
-
- move_right(arg0: number): void;
-
- move_down(arg0: number): void;
-
- move_up(arg0: number): void;
-
+}
+/**
+*/
+export class TreasureChest {
+  free(): void;
 }

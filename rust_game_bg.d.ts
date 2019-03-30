@@ -1,0 +1,26 @@
+/* tslint:disable */
+export const memory: WebAssembly.Memory;
+export function start_game(a: number, b: number, c: number, d: number): number;
+export function game_tick(a: number, b: number): number;
+export function game_get_world_pixels(a: number): number;
+export function game_get_state(a: number): number;
+export function game_loot(a: number): number;
+export function __wbg_game_free(a: number): void;
+export function __wbg_treasurechest_free(a: number): void;
+export function __wbg_character_free(a: number): void;
+export function character_new_enemy(a: number, b: number): number;
+export function character_new_hero(a: number, b: number): number;
+export function character_name(a: number, b: number): void;
+export function character_coords(a: number, b: number): void;
+export function character_get_class(a: number): number;
+export function character_health(a: number): number;
+export function character_take_damage(a: number, b: number): void;
+export function character_heal(a: number, b: number): void;
+export function character_move_left(a: number, b: number): void;
+export function character_move_right(a: number, b: number): void;
+export function character_move_down(a: number, b: number): void;
+export function character_move_up(a: number, b: number): void;
+export function __wbindgen_global_argument_ptr(): number;
+export function __wbindgen_malloc(a: number): number;
+export function __wbindgen_realloc(a: number, b: number, c: number): number;
+export function __wbindgen_free(a: number, b: number): void;

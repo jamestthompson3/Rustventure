@@ -1,11 +1,8 @@
-/* tslint:disable */
 import * as wasm from './rust_game_bg';
 
-const TextEncoder = typeof self === 'object' && self.TextEncoder
-    ? self.TextEncoder
-    : require('util').TextEncoder;
+const lTextEncoder = typeof TextEncoder === 'undefined' ? require('util').TextEncoder : TextEncoder;
 
-let cachedEncoder = new TextEncoder('utf-8');
+let cachedTextEncoder = new lTextEncoder('utf-8');
 
 let cachegetUint8Memory = null;
 function getUint8Memory() {
@@ -15,12 +12,91 @@ function getUint8Memory() {
     return cachegetUint8Memory;
 }
 
-function passStringToWasm(arg) {
-    
-    const buf = cachedEncoder.encode(arg);
-    const ptr = wasm.__wbindgen_malloc(buf.length);
-    getUint8Memory().set(buf, ptr);
-    return [ptr, buf.length];
+let WASM_VECTOR_LEN = 0;
+
+let passStringToWasm;
+if (typeof cachedTextEncoder.encodeInto === 'function') {
+    passStringToWasm = function(arg) {
+
+        let size = arg.length;
+        let ptr = wasm.__wbindgen_malloc(size);
+        let writeOffset = 0;
+        while (true) {
+            const view = getUint8Memory().subarray(ptr + writeOffset, ptr + size);
+            const { read, written } = cachedTextEncoder.encodeInto(arg, view);
+            arg = arg.substring(read);
+            writeOffset += written;
+            if (arg.length === 0) {
+                break;
+            }
+            ptr = wasm.__wbindgen_realloc(ptr, size, size * 2);
+            size *= 2;
+        }
+        WASM_VECTOR_LEN = writeOffset;
+        return ptr;
+    };
+} else {
+    passStringToWasm = function(arg) {
+
+        const buf = cachedTextEncoder.encode(arg);
+        const ptr = wasm.__wbindgen_malloc(buf.length);
+        getUint8Memory().set(buf, ptr);
+        WASM_VECTOR_LEN = buf.length;
+        return ptr;
+    };
+}
+/**
+* @param {number} width
+* @param {number} height
+* @param {string} hero_name
+* @returns {Game}
+*/
+export function start_game(width, height, hero_name) {
+    const ptr2 = passStringToWasm(hero_name);
+    const len2 = WASM_VECTOR_LEN;
+    return Game.__wrap(wasm.start_game(width, height, ptr2, len2));
+}
+
+const heap = new Array(32);
+
+heap.fill(undefined);
+
+heap.push(undefined, null, true, false);
+
+function getObject(idx) { return heap[idx]; }
+
+let heap_next = heap.length;
+
+function dropObject(idx) {
+    if (idx < 36) return;
+    heap[idx] = heap_next;
+    heap_next = idx;
+}
+
+function takeObject(idx) {
+    const ret = getObject(idx);
+    dropObject(idx);
+    return ret;
+}
+
+export function __wbg_random_c216f62dd7602115() {
+    return Math.random();
+}
+
+const lTextDecoder = typeof TextDecoder === 'undefined' ? require('util').TextDecoder : TextDecoder;
+
+let cachedTextDecoder = new lTextDecoder('utf-8');
+
+function getStringFromWasm(ptr, len) {
+    return cachedTextDecoder.decode(getUint8Memory().subarray(ptr, ptr + len));
+}
+
+let cachedGlobalArgumentPtr = null;
+function globalArgumentPtr() {
+    if (cachedGlobalArgumentPtr === null) {
+        cachedGlobalArgumentPtr = wasm.__wbindgen_global_argument_ptr();
+    }
+    return cachedGlobalArgumentPtr;
 }
 
 let cachegetUint32Memory = null;
@@ -35,384 +111,221 @@ function getArrayU32FromWasm(ptr, len) {
     return getUint32Memory().subarray(ptr / 4, ptr / 4 + len);
 }
 
-let cachedGlobalArgumentPtr = null;
-function globalArgumentPtr() {
-    if (cachedGlobalArgumentPtr === null) {
-        cachedGlobalArgumentPtr = wasm.__wbindgen_global_argument_ptr();
-    }
-    return cachedGlobalArgumentPtr;
+export function __wbg_random_28a14a8b9cdf19f7() {
+    return Math.random();
 }
 
-const stack = [];
-
-const slab = [{ obj: undefined }, { obj: null }, { obj: true }, { obj: false }];
-
-function getObject(idx) {
-    if ((idx & 1) === 1) {
-        return stack[idx >> 1];
-    } else {
-        const val = slab[idx >> 1];
-        
-        return val.obj;
-        
-    }
-}
-
-let slab_next = slab.length;
-
-function dropRef(idx) {
-    
-    idx = idx >> 1;
-    if (idx < 4) return;
-    let obj = slab[idx];
-    
-    obj.cnt -= 1;
-    if (obj.cnt > 0) return;
-    
-    // If we hit 0 then free up our space in the slab
-    slab[idx] = slab_next;
-    slab_next = idx;
-}
-
-function takeObject(idx) {
-    const ret = getObject(idx);
-    dropRef(idx);
-    return ret;
-}
-
-const __wbg_time_3127089b3be1de08_target = console.time;
-
-const TextDecoder = typeof self === 'object' && self.TextDecoder
-    ? self.TextDecoder
-    : require('util').TextDecoder;
-
-let cachedDecoder = new TextDecoder('utf-8');
-
-function getStringFromWasm(ptr, len) {
-    return cachedDecoder.decode(getUint8Memory().subarray(ptr, ptr + len));
-}
-
-export function __wbg_time_3127089b3be1de08(arg0, arg1) {
+export function __wbg_error_569d7454c64f6dbe(arg0, arg1) {
     let varg0 = getStringFromWasm(arg0, arg1);
-    __wbg_time_3127089b3be1de08_target(varg0);
-}
 
-const __wbg_timeEnd_84a125ce239dd100_target = console.timeEnd;
-
-export function __wbg_timeEnd_84a125ce239dd100(arg0, arg1) {
-    let varg0 = getStringFromWasm(arg0, arg1);
-    __wbg_timeEnd_84a125ce239dd100_target(varg0);
-}
-
-const __wbg_random_66a024bb58194b7c_target = Math.random;
-
-export function __wbg_random_66a024bb58194b7c() {
-    return __wbg_random_66a024bb58194b7c_target();
-}
-
-const __wbg_error_2c2dd5f14f439749_target = console.error;
-
-export function __wbg_error_2c2dd5f14f439749(arg0, arg1) {
-    let varg0 = getStringFromWasm(arg0, arg1);
-    
     varg0 = varg0.slice();
     wasm.__wbindgen_free(arg0, arg1 * 1);
-    
-    __wbg_error_2c2dd5f14f439749_target(varg0);
+
+    console.error(varg0);
 }
-/**
-*/
-export class World {
-    
-    static __construct(ptr) {
-        return new World(ptr);
-    }
-    
-    constructor(ptr) {
-        this.ptr = ptr;
-    }
-    
-    free() {
-        const ptr = this.ptr;
-        this.ptr = 0;
-        wasm.__wbg_world_free(ptr);
-    }
-    /**
-    * @param {number} arg0
-    * @param {number} arg1
-    * @param {string} arg2
-    * @returns {World}
-    */
-    static new(arg0, arg1, arg2) {
-        const [ptr2, len2] = passStringToWasm(arg2);
-        return World.__construct(wasm.world_new(arg0, arg1, ptr2, len2));
-    }
-    /**
-    * @returns {number}
-    */
-    width() {
-        if (this.ptr === 0) {
-            throw new Error('Attempt to use a moved value');
-        }
-        return wasm.world_width(this.ptr);
-    }
-    /**
-    * @returns {number}
-    */
-    height() {
-        if (this.ptr === 0) {
-            throw new Error('Attempt to use a moved value');
-        }
-        return wasm.world_height(this.ptr);
-    }
-    /**
-    * @returns {number}
-    */
-    pixels() {
-        if (this.ptr === 0) {
-            throw new Error('Attempt to use a moved value');
-        }
-        return wasm.world_pixels(this.ptr);
-    }
-    /**
-    * @returns {number}
-    */
-    get_hero_health() {
-        if (this.ptr === 0) {
-            throw new Error('Attempt to use a moved value');
-        }
-        return wasm.world_get_hero_health(this.ptr);
-    }
-    /**
-    * @returns {Uint32Array}
-    */
-    get_hero_coords() {
-        if (this.ptr === 0) {
-            throw new Error('Attempt to use a moved value');
-        }
-        const retptr = globalArgumentPtr();
-        wasm.world_get_hero_coords(retptr, this.ptr);
-        const mem = getUint32Memory();
-        const rustptr = mem[retptr / 4];
-        const rustlen = mem[retptr / 4 + 1];
-        
-        const realRet = getArrayU32FromWasm(rustptr, rustlen).slice();
-        wasm.__wbindgen_free(rustptr, rustlen * 4);
-        return realRet;
-        
-    }
-    /**
-    * @returns {any}
-    */
-    loot() {
-        if (this.ptr === 0) {
-            throw new Error('Attempt to use a moved value');
-        }
-        return takeObject(wasm.world_loot(this.ptr));
-    }
-    /**
-    * @returns {any}
-    */
-    enemies() {
-        if (this.ptr === 0) {
-            throw new Error('Attempt to use a moved value');
-        }
-        return takeObject(wasm.world_enemies(this.ptr));
-    }
-    /**
-    * @param {number} arg0
-    * @returns {any}
-    */
-    tick(arg0) {
-        if (this.ptr === 0) {
-            throw new Error('Attempt to use a moved value');
-        }
-        return takeObject(wasm.world_tick(this.ptr, arg0));
-    }
+
+function addHeapObject(obj) {
+    if (heap_next === heap.length) heap.push(heap.length + 1);
+    const idx = heap_next;
+    heap_next = heap[idx];
+
+    heap[idx] = obj;
+    return idx;
 }
-/**
-*/
-export class TreasureChest {
-    
-    static __construct(ptr) {
-        return new TreasureChest(ptr);
-    }
-    
-    constructor(ptr) {
-        this.ptr = ptr;
-    }
-    
-    free() {
-        const ptr = this.ptr;
-        this.ptr = 0;
-        wasm.__wbg_treasurechest_free(ptr);
-    }
+
+export function __wbindgen_json_parse(ptr, len) { return addHeapObject(JSON.parse(getStringFromWasm(ptr, len))); }
+
+export function __wbindgen_throw(ptr, len) {
+    throw new Error(getStringFromWasm(ptr, len));
+}
+
+function freeCharacter(ptr) {
+
+    wasm.__wbg_character_free(ptr);
 }
 /**
 */
 export class Character {
-    
-    static __construct(ptr) {
-        return new Character(ptr);
+
+    static __wrap(ptr) {
+        const obj = Object.create(Character.prototype);
+        obj.ptr = ptr;
+
+        return obj;
     }
-    
-    constructor(ptr) {
-        this.ptr = ptr;
-    }
-    
+
     free() {
         const ptr = this.ptr;
         this.ptr = 0;
-        wasm.__wbg_character_free(ptr);
+        freeCharacter(ptr);
     }
+
     /**
-    * @param {number} arg0
-    * @param {number} arg1
+    * @param {number} x
+    * @param {number} y
     * @returns {Character}
     */
-    static new_enemy(arg0, arg1) {
-        return Character.__construct(wasm.character_new_enemy(arg0, arg1));
+    static new_enemy(x, y) {
+        return Character.__wrap(wasm.character_new_enemy(x, y));
     }
     /**
-    * @param {string} arg0
+    * @param {string} name
     * @returns {Character}
     */
-    static new_hero(arg0) {
-        const [ptr0, len0] = passStringToWasm(arg0);
-        return Character.__construct(wasm.character_new_hero(ptr0, len0));
+    static new_hero(name) {
+        const ptr0 = passStringToWasm(name);
+        const len0 = WASM_VECTOR_LEN;
+        return Character.__wrap(wasm.character_new_hero(ptr0, len0));
     }
     /**
     * @returns {string}
     */
     name() {
-        if (this.ptr === 0) {
-            throw new Error('Attempt to use a moved value');
-        }
         const retptr = globalArgumentPtr();
         wasm.character_name(retptr, this.ptr);
         const mem = getUint32Memory();
         const rustptr = mem[retptr / 4];
         const rustlen = mem[retptr / 4 + 1];
-        
+
         const realRet = getStringFromWasm(rustptr, rustlen).slice();
         wasm.__wbindgen_free(rustptr, rustlen * 1);
         return realRet;
-        
+
     }
     /**
     * @returns {Uint32Array}
     */
     coords() {
-        if (this.ptr === 0) {
-            throw new Error('Attempt to use a moved value');
-        }
         const retptr = globalArgumentPtr();
         wasm.character_coords(retptr, this.ptr);
         const mem = getUint32Memory();
         const rustptr = mem[retptr / 4];
         const rustlen = mem[retptr / 4 + 1];
-        
+
         const realRet = getArrayU32FromWasm(rustptr, rustlen).slice();
         wasm.__wbindgen_free(rustptr, rustlen * 4);
         return realRet;
-        
+
     }
     /**
     * @returns {number}
     */
     get_class() {
-        if (this.ptr === 0) {
-            throw new Error('Attempt to use a moved value');
-        }
         return wasm.character_get_class(this.ptr);
     }
     /**
     * @returns {number}
     */
     health() {
-        if (this.ptr === 0) {
-            throw new Error('Attempt to use a moved value');
-        }
         return wasm.character_health(this.ptr);
     }
     /**
-    * @param {number} arg0
+    * @param {number} hit
     * @returns {void}
     */
-    take_damage(arg0) {
-        if (this.ptr === 0) {
-            throw new Error('Attempt to use a moved value');
-        }
-        return wasm.character_take_damage(this.ptr, arg0);
+    take_damage(hit) {
+        return wasm.character_take_damage(this.ptr, hit);
     }
     /**
-    * @param {number} arg0
+    * @param {number} heal
     * @returns {void}
     */
-    heal(arg0) {
-        if (this.ptr === 0) {
-            throw new Error('Attempt to use a moved value');
-        }
-        return wasm.character_heal(this.ptr, arg0);
+    heal(heal) {
+        return wasm.character_heal(this.ptr, heal);
     }
     /**
-    * @param {number} arg0
+    * @param {number} width
     * @returns {void}
     */
-    move_left(arg0) {
-        if (this.ptr === 0) {
-            throw new Error('Attempt to use a moved value');
-        }
-        return wasm.character_move_left(this.ptr, arg0);
+    move_left(width) {
+        return wasm.character_move_left(this.ptr, width);
     }
     /**
-    * @param {number} arg0
+    * @param {number} width
     * @returns {void}
     */
-    move_right(arg0) {
-        if (this.ptr === 0) {
-            throw new Error('Attempt to use a moved value');
-        }
-        return wasm.character_move_right(this.ptr, arg0);
+    move_right(width) {
+        return wasm.character_move_right(this.ptr, width);
     }
     /**
-    * @param {number} arg0
+    * @param {number} height
     * @returns {void}
     */
-    move_down(arg0) {
-        if (this.ptr === 0) {
-            throw new Error('Attempt to use a moved value');
-        }
-        return wasm.character_move_down(this.ptr, arg0);
+    move_down(height) {
+        return wasm.character_move_down(this.ptr, height);
     }
     /**
-    * @param {number} arg0
+    * @param {number} height
     * @returns {void}
     */
-    move_up(arg0) {
-        if (this.ptr === 0) {
-            throw new Error('Attempt to use a moved value');
-        }
-        return wasm.character_move_up(this.ptr, arg0);
+    move_up(height) {
+        return wasm.character_move_up(this.ptr, height);
     }
 }
 
-function addHeapObject(obj) {
-    if (slab_next === slab.length) slab.push(slab.length + 1);
-    const idx = slab_next;
-    const next = slab[idx];
-    
-    slab_next = next;
-    
-    slab[idx] = { obj, cnt: 1 };
-    return idx << 1;
+function freeGame(ptr) {
+
+    wasm.__wbg_game_free(ptr);
+}
+/**
+*/
+export class Game {
+
+    static __wrap(ptr) {
+        const obj = Object.create(Game.prototype);
+        obj.ptr = ptr;
+
+        return obj;
+    }
+
+    free() {
+        const ptr = this.ptr;
+        this.ptr = 0;
+        freeGame(ptr);
+    }
+    /**
+    * @param {number} event_code
+    * @returns {any}
+    */
+    tick(event_code) {
+        return takeObject(wasm.game_tick(this.ptr, event_code));
+    }
+    /**
+    * @returns {number}
+    */
+    get_world_pixels() {
+        return wasm.game_get_world_pixels(this.ptr);
+    }
+    /**
+    * @returns {any}
+    */
+    get_state() {
+        return takeObject(wasm.game_get_state(this.ptr));
+    }
+    /**
+    * @returns {any}
+    */
+    loot() {
+        return takeObject(wasm.game_loot(this.ptr));
+    }
+
 }
 
-export function __wbindgen_json_parse(ptr, len) {
-    return addHeapObject(JSON.parse(getStringFromWasm(ptr, len)));
+function freeTreasureChest(ptr) {
+
+    wasm.__wbg_treasurechest_free(ptr);
+}
+/**
+*/
+export class TreasureChest {
+
+    free() {
+        const ptr = this.ptr;
+        this.ptr = 0;
+        freeTreasureChest(ptr);
+    }
+
 }
 
-export function __wbindgen_throw(ptr, len) {
-    throw new Error(getStringFromWasm(ptr, len));
-}
+export function __wbindgen_object_drop_ref(i) { dropObject(i); }
 
