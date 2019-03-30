@@ -6,7 +6,7 @@
     "bundle": "npm run build-release && webpack"
   },
   "devDependencies": {
-    "copy-webpack-plugin": "^4.5.2",
+    "copy-webpack-plugin": "^5.0.2",
     "webpack": "^4.16.1",
     "webpack-cli": "^3.1.0",
     "webpack-dev-server": "^3.1.4"
