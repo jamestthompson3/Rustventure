@@ -1,22 +1,22 @@
-#![feature(exclusive_range_pattern)]
-
 extern crate console_error_panic_hook;
 extern crate js_sys;
 extern crate rand;
 extern crate wasm_bindgen;
 pub mod characters;
+pub mod utils;
 
 #[macro_use]
 extern crate serde_derive;
 
 use characters::*;
 use std::prelude::v1::Vec;
+use utils::*;
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 pub fn start_game(width: u32, height: u32, hero_name: String) -> Game {
     let world = intialize_world(width, height);
-    let state = set_initial_game_state(hero_name);
+    let state = set_initial_game_state(hero_name, width, height);
     Game { world, state }
 }
 
@@ -29,7 +29,7 @@ fn intialize_world(width: u32, height: u32) -> World {
                 Pixel::Desert
             } else if (i as f64 * js_sys::Math::random() * 100 as f64) as u32 % 3 == 1 {
                 Pixel::Grass
-            } else if (i as f64 * js_sys::Math::random() * 340 as f64) as u32 % 5 == 0  {
+            } else if (i as f64 * js_sys::Math::random() * 340 as f64) as u32 % 5 == 0 {
                 Pixel::Water
             } else {
                 Pixel::Grass
@@ -50,8 +50,8 @@ fn seed_loot(_height: &u32, _width: &u32) -> Vec<TreasureChest> {
     let mut boxes = Vec::new();
 
     for n in 0..num_boxes {
-        let x: u32 = n % 3 * 20;
-        let y: u32 = n % 4 * 10;
+        let x: u32 = gen_rand_coord(n as f64, *_width as f64);
+        let y: u32 = gen_rand_coord(n as f64, *_height as f64);
         let contents_gen: u32 = random() as u32 * 100;
         let loot = match contents_gen {
             0 => Treasure::Potion { value: 2 },
@@ -74,10 +74,13 @@ fn seed_loot(_height: &u32, _width: &u32) -> Vec<TreasureChest> {
     boxes
 }
 
-fn set_initial_game_state(hero_name: String) -> GameState {
+fn set_initial_game_state(hero_name: String, height: u32, width: u32) -> GameState {
     let mut enemies = Vec::new();
     for i in 0..10 {
-        enemies.push(Character::new_enemy(i % 3 * 10, i % 2));
+        enemies.push(Character::new_enemy(
+            gen_rand_coord((i % 3) as f64 * 10 as f64, width as f64),
+            gen_rand_coord((i % 2) as f64, height as f64),
+        ));
     }
     let player = Character::new_hero(hero_name);
 

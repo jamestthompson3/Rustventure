@@ -1,5 +1,5 @@
-import { start_game } from "./rust_game";
-import { memory } from "./rust_game_bg";
+import { start_game } from "./pkg/rust_game";
+import { memory } from "./pkg/rust_game_bg";
 import { genRandCoord } from "./utils";
 // styles
 const GRASS_COLOR = "#2f7a60";
@@ -41,6 +41,7 @@ const bindingsArray = [...LEFT, ...RIGHT, ...UP, ...DOWN];
 const handleMove = e => {
   if (bindingsArray.includes(e.which)) {
     const tick = game.tick(e.which);
+    console.log(tick);
     drawHero();
     if (typeof tick !== "string") {
       renderCollision(tick);
@@ -90,18 +91,13 @@ const drawCells = () => {
   const boxes = game.loot();
   boxes.forEach(box => {
     ctx.fillStyle = "#ffe030";
-    ctx.fillRect(genRandCoord(box.x, width), genRandCoord(box.y, height), 8, 8);
+    ctx.fillRect(box.x, box.y, 8, 8);
   });
 
   const { enemies } = game.get_state();
   enemies.forEach(enemy => {
     ctx.fillStyle = "#BAD";
-    ctx.fillRect(
-      genRandCoord(enemy.x, width),
-      genRandCoord(enemy.y, height),
-      8,
-      8
-    );
+    ctx.fillRect(enemy.x, enemy.y, 8, 8);
   });
 };
 
@@ -125,7 +121,7 @@ const renderCollision = tick => {
   banner.innerHTML = `You found ${type.replace('"', "")} - ${JSON.stringify(
     tick.Treasure.value[type]
   ).replace(/\{|\}|"/g, "")}`;
-  setTimeout(hideBanner, 500);
+  setTimeout(hideBanner, 1500);
 };
 
 const hideBanner = () => {
